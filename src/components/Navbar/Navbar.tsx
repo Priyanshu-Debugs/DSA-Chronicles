@@ -23,7 +23,7 @@ const navItems: NavItem[] = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { user, logout, loading, isFirebaseAvailable } = useAuth();
+  const { user, profile, logout, loading, isFirebaseAvailable } = useAuth();
 
   if (pathname === "/login") return null;
 
@@ -63,9 +63,13 @@ export default function Navbar() {
             <div className="flex items-center space-x-2 border-l-2 border-black pl-3 shrink-0">
               {user ? (
                 <>
-                  <span className="hidden lg:inline-block text-xs font-black uppercase max-w-[120px] truncate text-black">
-                    {user.email?.split("@")[0]}
-                  </span>
+                  <Link
+                    href="/profile"
+                    className="hidden lg:inline-block text-xs font-black uppercase max-w-[120px] truncate text-black border border-black px-2 py-1.5 bg-neoYellow shadow-neo-sm hover:-translate-y-0.5 neo-clickable"
+                    title="View Profile"
+                  >
+                    {profile?.displayName || user.email?.split("@")[0] || "Profile"}
+                  </Link>
                   <button
                     onClick={logout}
                     className="shrink-0 text-xs font-black uppercase border-2 border-black py-1.5 px-3 rounded bg-neoRed shadow-neo-sm hover:bg-red-300 transition-all neo-clickable cursor-pointer text-black"

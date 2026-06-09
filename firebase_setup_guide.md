@@ -95,3 +95,19 @@ This step-by-step guide explains how to set up a new Firebase project, enable Au
    ```
 3. If your Next.js development server is currently running, **restart it** in the terminal so it pulls in the new env file values:
    - Press `Ctrl + C` in the terminal to stop the server, then run `npm run dev` to start it again.
+
+---
+
+## Step 8: Whitelist Deployment Domains (e.g. Vercel)
+If you host your website (e.g., on Vercel at `dsa-chronicles.vercel.app`), Firebase will reject Google Sign-In requests with the error `auth/unauthorized-domain` until the domain is whitelisted in the Firebase Console.
+
+1. Open the [Firebase Console](https://console.firebase.google.com/) and go to your project dashboard.
+2. In the left-sidebar, click on **Build** -> **Authentication**.
+3. Select the **Settings** tab at the top of the Authentication page.
+4. In the side sub-menu, click on **Authorized domains**.
+5. Click the **Add domain** button.
+6. Enter your deployment domain name:
+   `dsa-chronicles.vercel.app`
+   *(Do not include `https://` or URL subpaths like `/login` — just enter the bare domain).*
+7. Click **Add**.
+8. It will take about 10–30 seconds to update. Once added, Google Sign-In will work seamlessly on your hosted website!

@@ -13,7 +13,7 @@ interface DsaDashboardProps {
 }
 
 export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   
   const [solvedMap, setSolvedMap] = useState<Record<string, { solved: boolean; date?: string }>>({});
   const [notesMap, setNotesMap] = useState<Record<string, string>>({});
@@ -239,6 +239,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
             {getHeaderTitle()}
           </h1>
           <p className="text-sm md:text-base font-black border-t-2 border-black pt-2 max-w-xl">
+            {profile?.displayName ? `Welcome back, ${profile.displayName}! ` : ""}
             Conquer the A2Z roadmap. Crush coding interviews. Build consistency.
           </p>
         </div>
