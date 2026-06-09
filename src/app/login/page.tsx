@@ -91,31 +91,19 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleSignIn = () => {
+  const handleGoogleSignIn = async () => {
     setErrorMsg("");
+    setSubmitting(true);
     try {
-      const promise = signInWithGoogle();
-      setSubmitting(true);
-      promise
-        .then(() => {
-          router.push("/");
-        })
-        .catch((err: unknown) => {
-          console.error(err);
-          const error = err as { code?: string; message?: string };
-          if (error.code === "auth/popup-blocked") {
-            setErrorMsg("Pop-up blocked! Please click the 'Pop-up blocked' icon on the right side of your browser's address bar (top-right) and select 'Always allow pop-ups' for this website, then try again.");
-          } else if (error.code !== "auth/popup-closed-by-user") {
-            setErrorMsg(error.message || "Google Sign-In failed.");
-          }
-        })
-        .finally(() => {
-          setSubmitting(false);
-        });
+      await signInWithGoogle();
+      router.push("/");
     } catch (err: unknown) {
       console.error(err);
-      const error = err as { message?: string };
-      setErrorMsg(error.message || "Failed to initialize Google Sign-In.");
+      const error = err as { code?: string; message?: string };
+      if (error.code !== "auth/popup-closed-by-user") {
+        setErrorMsg(error.message || "Google Sign-In failed.");
+      }
+    } finally {
       setSubmitting(false);
     }
   };

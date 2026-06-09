@@ -9,6 +9,7 @@ import {
   setDoc,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
   getRedirectResult,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -28,7 +29,7 @@ interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<unknown>;
+  signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   signUpWithEmail: (email: string, pass: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -150,11 +151,11 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
     localStorage.removeItem("dsa_guest_mode");
   };
 
-  const signInWithGoogle = () => {
-    if (!auth) return Promise.reject(new Error("Firebase auth is not configured."));
+  const signInWithGoogle = async () => {
+    if (!auth) throw new Error("Firebase auth is not configured.");
     clearGuest();
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
+    await signInWithRedirect(auth, provider);
   };
 
   const signInWithEmail = async (email: string, pass: string) => {
