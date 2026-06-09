@@ -155,7 +155,17 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
     if (!auth) throw new Error("Firebase auth is not configured.");
     clearGuest();
     const provider = new GoogleAuthProvider();
-    await signInWithRedirect(auth, provider);
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (err: unknown) {
+      const error = err as { code?: string };
+      if (error.code === "auth/popup-blocked") {
+        console.warn("Popup blocked, falling back to redirect authentication...");
+        await signInWithRedirect(auth, provider);
+      } else {
+        throw err;
+      }
+    }
   };
 
   const signInWithEmail = async (email: string, pass: string) => {
