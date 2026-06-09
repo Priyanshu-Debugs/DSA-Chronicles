@@ -326,7 +326,7 @@ export default function ProfilePage() {
 // @namespace    http://tampermonkey.net/
 // @version      1.0
 // @description  Syncs LeetCode and GeeksforGeeks solved problems to your DSA Chronicles Tracker in real-time.
-// @author       Antigravity
+// @author       Priyanshu
 // @match        https://leetcode.com/problems/*
 // @match        https://www.geeksforgeeks.org/problems/*
 // @grant        GM_xmlhttpRequest
