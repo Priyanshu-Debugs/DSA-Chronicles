@@ -103,7 +103,9 @@ export default function LoginPage() {
         .catch((err: unknown) => {
           console.error(err);
           const error = err as { code?: string; message?: string };
-          if (error.code !== "auth/popup-closed-by-user") {
+          if (error.code === "auth/popup-blocked") {
+            setErrorMsg("Pop-up blocked! Please click the 'Pop-up blocked' icon on the right side of your browser's address bar (top-right) and select 'Always allow pop-ups' for this website, then try again.");
+          } else if (error.code !== "auth/popup-closed-by-user") {
             setErrorMsg(error.message || "Google Sign-In failed.");
           }
         })
