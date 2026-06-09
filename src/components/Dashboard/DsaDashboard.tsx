@@ -6,7 +6,7 @@ import { Problem, a2zDsaSheetData } from "@/data/a2zDsaSheet";
 import ProgressGrid from "@/components/Tracker/ProgressGrid";
 import NotebookEditor from "@/components/Notebook/NotebookEditor";
 import { useAuth } from "@/context/AuthContext";
-import { db, doc, getDoc, setDoc } from "@/lib/firebase";
+import { db, doc, getDoc, setDoc, onSnapshot } from "@/lib/firebase";
 
 interface DsaDashboardProps {
   stepIdFilter?: string | string[];
@@ -39,6 +39,8 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
   useEffect(() => {
     if (authLoading) return;
 
+    let unsubscribe: (() => void) | undefined;
+
     const loadUserData = async () => {
       setDataLoading(true);
       
@@ -57,50 +59,69 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
       if (user && db) {
         try {
           const userDocRef = doc(db, "users", user.uid);
-          const userDocSnap = await getDoc(userDocRef);
           
-          if (userDocSnap.exists()) {
-            const data = userDocSnap.data();
-            const dbSolved = data.solvedMap || {};
-            const dbNotes = data.notesMap || {};
-            
-            // Merge any local progress that isn't on database yet
-            const mergedSolved = { ...localSolved, ...dbSolved };
-            const mergedNotes = { ...localNotes, ...dbNotes };
-            
-            setSolvedMap(mergedSolved);
-            setNotesMap(mergedNotes);
+          // Use real-time listener to sync solves as they happen
+          unsubscribe = onSnapshot(userDocRef, async (docSnap) => {
+            if (docSnap.exists()) {
+              const data = docSnap.data();
+              const dbSolved = data.solvedMap || {};
+              const dbNotes = data.notesMap || {};
+              
+              // Merge any local progress that isn't on database yet
+              const mergedSolved = { ...localSolved, ...dbSolved };
+              const mergedNotes = { ...localNotes, ...dbNotes };
+              
+              setSolvedMap(mergedSolved);
+              setNotesMap(mergedNotes);
+              setDataLoading(false);
 
-            // Sync merged state back to Firestore if there was local progress
-            if (Object.keys(localSolved).length > 0 || Object.keys(localNotes).length > 0) {
-              await setDoc(userDocRef, { solvedMap: mergedSolved, notesMap: mergedNotes }, { merge: true });
+              // Sync merged state back to Firestore if there was local progress
+              if (Object.keys(localSolved).length > 0 || Object.keys(localNotes).length > 0) {
+                await setDoc(userDocRef, { solvedMap: mergedSolved, notesMap: mergedNotes }, { merge: true });
+                localStorage.removeItem("dsa_solved_map");
+                localStorage.removeItem("dsa_notes_map");
+                localSolved = {};
+                localNotes = {};
+              }
+            } else {
+              // First time logging in, initialize firestore with local storage data
+              await setDoc(userDocRef, { solvedMap: localSolved, notesMap: localNotes });
+              setSolvedMap(localSolved);
+              setNotesMap(localNotes);
+              setDataLoading(false);
+              
               localStorage.removeItem("dsa_solved_map");
               localStorage.removeItem("dsa_notes_map");
+              localSolved = {};
+              localNotes = {};
             }
-          } else {
-            // First time logging in, initialize firestore with local storage data
-            await setDoc(userDocRef, { solvedMap: localSolved, notesMap: localNotes });
+          }, (err) => {
+            console.error("Firestore onSnapshot error:", err);
             setSolvedMap(localSolved);
             setNotesMap(localNotes);
-            
-            localStorage.removeItem("dsa_solved_map");
-            localStorage.removeItem("dsa_notes_map");
-          }
+            setDataLoading(false);
+          });
         } catch (err) {
-          console.error("Error reading Firestore:", err);
+          console.error("Error setting up subscription:", err);
           setSolvedMap(localSolved);
           setNotesMap(localNotes);
+          setDataLoading(false);
         }
       } else {
         // Guest mode, use local storage
         setSolvedMap(localSolved);
         setNotesMap(localNotes);
+        setDataLoading(false);
       }
-      
-      setDataLoading(false);
     };
 
     loadUserData();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [user, authLoading]);
 
   const totalProblems = filteredSteps.reduce(

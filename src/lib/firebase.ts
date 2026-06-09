@@ -40,4 +40,4 @@ if (isFirebaseConfigured) {
 
 export { auth, db };
 export { GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, type User } from "firebase/auth";
-export { doc, getDoc, setDoc } from "firebase/firestore";
+export { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
