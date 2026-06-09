@@ -238,9 +238,19 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
           <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2 uppercase">
             {getHeaderTitle()}
           </h1>
-          <p className="text-sm md:text-base font-black border-t-2 border-black pt-2 max-w-xl">
-            {profile?.displayName ? `Welcome back, ${profile.displayName}! ` : ""}
-            Conquer the A2Z roadmap. Crush coding interviews. Build consistency.
+          <p className="text-sm md:text-base font-black border-t-2 border-black pt-2 max-w-xl flex items-center gap-2">
+            {user?.photoURL && (
+              <img
+                src={user.photoURL}
+                alt="Profile Avatar"
+                referrerPolicy="no-referrer"
+                className="w-7 h-7 rounded-full border-2 border-black object-cover shadow-neo-sm shrink-0"
+              />
+            )}
+            <span>
+              {profile?.displayName ? `Welcome back, ${profile.displayName}! ` : ""}
+              Conquer the A2Z roadmap. Crush coding interviews. Build consistency.
+            </span>
           </p>
         </div>
 

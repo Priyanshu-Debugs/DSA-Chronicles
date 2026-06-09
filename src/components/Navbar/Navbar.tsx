@@ -65,10 +65,20 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/profile"
-                    className="hidden lg:inline-block text-xs font-black uppercase max-w-[120px] truncate text-black border border-black px-2 py-1.5 bg-neoYellow shadow-neo-sm hover:-translate-y-0.5 neo-clickable"
+                    className="flex items-center space-x-1.5 text-xs font-black uppercase text-black border-2 border-black px-2.5 py-1 bg-neoYellow shadow-neo-sm hover:-translate-y-0.5 neo-clickable"
                     title="View Profile"
                   >
-                    {profile?.displayName || user.email?.split("@")[0] || "Profile"}
+                    {user.photoURL && (
+                      <img
+                        src={user.photoURL}
+                        alt="Avatar"
+                        referrerPolicy="no-referrer"
+                        className="w-5 h-5 rounded-full border border-black object-cover shrink-0"
+                      />
+                    )}
+                    <span className="hidden sm:inline-block max-w-[100px] truncate">
+                      {profile?.displayName || user.email?.split("@")[0] || "Profile"}
+                    </span>
                   </Link>
                   <button
                     onClick={logout}

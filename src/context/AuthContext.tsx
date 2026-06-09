@@ -20,6 +20,7 @@ export interface UserProfile {
   displayName?: string;
   leetcodeUsername?: string;
   gfgUsername?: string;
+  syncToken?: string;
 }
 
 interface AuthContextType {
@@ -62,19 +63,33 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
         try {
           const userDocRef = doc(db, "users", currentUser.uid);
           const userDocSnap = await getDoc(userDocRef);
+          
+          let token = "";
           if (userDocSnap.exists()) {
             const data = userDocSnap.data();
+            token = data.syncToken;
+            
+            if (!token) {
+              token = Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+              await setDoc(userDocRef, { syncToken: token }, { merge: true });
+            }
+            
             setProfile({
               displayName: data.displayName || currentUser.email?.split("@")[0] || "User",
               leetcodeUsername: data.leetcodeUsername || "",
               gfgUsername: data.gfgUsername || "",
+              syncToken: token,
             });
           } else {
-            setProfile({
+            token = Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+            const defaultProfile = {
               displayName: currentUser.email?.split("@")[0] || "User",
               leetcodeUsername: "",
               gfgUsername: "",
-            });
+              syncToken: token,
+            };
+            await setDoc(userDocRef, defaultProfile);
+            setProfile(defaultProfile);
           }
         } catch (err) {
           console.error("Error loading profile from Firestore:", err);
