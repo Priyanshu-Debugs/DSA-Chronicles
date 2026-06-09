@@ -9,6 +9,7 @@ import {
   setDoc,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
@@ -123,7 +124,16 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
     if (!auth) throw new Error("Firebase auth is not configured.");
     clearGuest();
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (err: any) {
+      if (err.code === "auth/popup-blocked") {
+        console.warn("Popup blocked, falling back to redirect authentication...");
+        await signInWithRedirect(auth, provider);
+      } else {
+        throw err;
+      }
+    }
   };
 
   const signInWithEmail = async (email: string, pass: string) => {
