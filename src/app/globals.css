@@ -1,26 +1,80 @@
 @import "tailwindcss";
 
+@theme {
+  --color-neoYellow: #FDE047;
+  --color-neoGreen: #4ADE80;
+  --color-neoBlue: #38BDF8;
+  --color-neoPink: #F472B6;
+  --color-neoPurple: #A78BFA;
+  --color-neoRed: #FB7185;
+  --color-neoCream: #FFFDEB;
+
+  --shadow-neo-sm: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-neo: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-neo-md: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-neo-lg: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+}
+
 :root {
-  --background: #ffffff;
+  --background: #FFFDEB;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
+
+/* Notebook paper pattern using gradients */
+.notebook-paper {
+  background-color: #ffffff;
+  background-image: 
+    /* Red Vertical Margin Line on the left */
+    linear-gradient(to right, transparent 49px, #fb7185 49px, #fb7185 51px, transparent 51px),
+    /* Repeating Light-Blue Horizontal Notebook Lines */
+    linear-gradient(to bottom, transparent 27px, #93c5fd 27px, #93c5fd 28px);
+  background-size: 100% 100%, 100% 28px;
+  line-height: 28px;
+  padding-left: 64px;
+  padding-right: 24px;
+  padding-top: 56px; /* Offsets first line alignment */
+}
+
+/* Flat Neubrutalist interactive clicking offset */
+.neo-clickable {
+  transition: all 100ms ease-out;
+}
+
+.neo-clickable:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1) !important;
+}
+
+/* Hide scrollbars but keep functionality */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Custom thin scrollbar for horizontal lists */
+.scrollbar-custom::-webkit-scrollbar {
+  height: 6px;
+}
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border: 1px solid #000000;
+  border-radius: 4px;
+}
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: #000000;
+  border-radius: 4px;
+}
+
