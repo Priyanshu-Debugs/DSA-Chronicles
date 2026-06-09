@@ -121,10 +121,17 @@ export default function LoginPage() {
           {isRegistering ? "Register" : "Login"}
         </div>
 
-        {/* Title */}
-        <h2 className="text-3xl font-black uppercase tracking-tight mb-2 mt-2">
-          {isRegistering ? "CREATE ACCOUNT" : "SIGN IN"}
-        </h2>
+        {/* Title & Logo Header */}
+        <div className="flex items-center gap-3 mb-2 mt-2">
+          <img
+            src="/logo.png"
+            alt="Logo"
+            className="w-10 h-10 rounded-lg border-2 border-black object-cover shadow-neo-sm transform -rotate-3 shrink-0"
+          />
+          <h2 className="text-3xl font-black uppercase tracking-tight">
+            {isRegistering ? "CREATE ACCOUNT" : "SIGN IN"}
+          </h2>
+        </div>
         <p className="text-xs font-bold text-gray-500 uppercase mb-6 tracking-wide">
           Sync notes and progress across all your devices
         </p>

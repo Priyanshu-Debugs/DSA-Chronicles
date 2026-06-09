@@ -16,8 +16,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DSA Practice",
-  description: "A platform to practice DSA problems",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || 
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://dsa-chronicles.vercel.app")
+  ),
+  title: "DSA Chronicles",
+  description: "A platform to practice DSA problems, sync progress, and learn patterns.",
+  openGraph: {
+    title: "DSA Chronicles",
+    description: "A platform to practice DSA problems, sync progress, and learn patterns.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "DSA Chronicles",
+    description: "A platform to practice DSA problems, sync progress, and learn patterns.",
+  },
 };
 
 export default function RootLayout({

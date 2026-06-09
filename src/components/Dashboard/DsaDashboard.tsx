@@ -235,9 +235,16 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
               </div>
             )}
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2 uppercase">
-            {getHeaderTitle()}
-          </h1>
+          <div className="flex items-center gap-3.5 mb-2 mt-1 flex-wrap">
+            <img
+              src="/logo.png"
+              alt="Logo"
+              className="w-12 h-12 rounded-xl border-4 border-black object-cover shadow-neo transform -rotate-3 shrink-0 bg-white"
+            />
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight uppercase">
+              {getHeaderTitle()}
+            </h1>
+          </div>
           <p className="text-sm md:text-base font-black border-t-2 border-black pt-2 max-w-xl flex items-center gap-2">
             {user?.photoURL && (
               <img

@@ -31,8 +31,13 @@ export default function Navbar() {
     <nav className="bg-white border-b-4 border-black sticky top-0 z-40 select-none">
       <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Branding Logo */}
-        <Link href="/" className="flex items-center space-x-2 shrink-0 -ml-1.5 md:-ml-2.5">
-          <span className="text-2xl font-black tracking-tighter uppercase border-2 border-black px-2 py-0.5 bg-neoYellow shadow-neo-sm transform -rotate-1 select-none text-black">
+        <Link href="/" className="flex items-center gap-2 shrink-0 -ml-1.5 md:-ml-2.5 select-none">
+          <img
+            src="/logo.png"
+            alt="Logo"
+            className="w-8 h-8 rounded border-2 border-black object-cover shadow-neo-sm transform -rotate-3 shrink-0"
+          />
+          <span className="text-2xl font-black tracking-tighter uppercase border-2 border-black px-2 py-0.5 bg-neoYellow shadow-neo-sm transform -rotate-1 text-black">
             DSA CHRONICLES
           </span>
         </Link>
