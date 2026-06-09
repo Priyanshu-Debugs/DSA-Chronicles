@@ -9,7 +9,6 @@ import {
   setDoc,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithRedirect,
   getRedirectResult,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -29,7 +28,7 @@ interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: () => Promise<unknown>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   signUpWithEmail: (email: string, pass: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -46,8 +45,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthContextProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isGuest, setIsGuest] = useState<boolean>(false);
+  const [loading, setLoading] = useState(() => !!auth);
+  const [isGuest, setIsGuest] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("dsa_guest_mode") === "true";
+    }
+    return false;
+  });
   const [redirectError, setRedirectError] = useState<string | null>(null);
 
   const isFirebaseAvailable = !!auth;
@@ -55,15 +59,18 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
   const clearRedirectError = () => setRedirectError(null);
 
   useEffect(() => {
-    const guest = localStorage.getItem("dsa_guest_mode") === "true";
-    setIsGuest(guest);
+    if (!auth) return;
 
-    if (!auth) {
-      setLoading(false);
-      return;
-    }
+    let redirectChecking = true;
+    let authStateReceived = false;
 
-    // Capture and handle redirect login results
+    const finalizeLoading = () => {
+      if (!redirectChecking && authStateReceived) {
+        setLoading(false);
+      }
+    };
+
+    // Capture and handle redirect login results before removing loading overlay
     getRedirectResult(auth)
       .then((result) => {
         if (result) {
@@ -73,6 +80,10 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
       .catch((err) => {
         console.error("Firebase redirect sign-in error:", err);
         setRedirectError(err.message || "Authentication redirect failed.");
+      })
+      .finally(() => {
+        redirectChecking = false;
+        finalizeLoading();
       });
 
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -122,7 +133,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
         setProfile(null);
       }
       
-      setLoading(false);
+      authStateReceived = true;
+      finalizeLoading();
     });
 
     return () => unsubscribe();
@@ -138,20 +150,11 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
     localStorage.removeItem("dsa_guest_mode");
   };
 
-  const signInWithGoogle = async () => {
-    if (!auth) throw new Error("Firebase auth is not configured.");
+  const signInWithGoogle = () => {
+    if (!auth) return Promise.reject(new Error("Firebase auth is not configured."));
     clearGuest();
     const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (err: any) {
-      if (err.code === "auth/popup-blocked") {
-        console.warn("Popup blocked, falling back to redirect authentication...");
-        await signInWithRedirect(auth, provider);
-      } else {
-        throw err;
-      }
-    }
+    return signInWithPopup(auth, provider);
   };
 
   const signInWithEmail = async (email: string, pass: string) => {

@@ -20,7 +20,12 @@ export default function ProfilePage() {
   const [gfgSyncing, setGfgSyncing] = useState(false);
   const [message, setMessage] = useState<{ text: string; isError: boolean } | null>(null);
 
-  const [siteOrigin, setSiteOrigin] = useState("http://localhost:3000");
+  const [siteOrigin] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.location.origin;
+    }
+    return "http://localhost:3000";
+  });
   const [copiedToken, setCopiedToken] = useState(false);
   const [copiedScript, setCopiedScript] = useState(false);
 
@@ -35,32 +40,12 @@ export default function ProfilePage() {
   } | null>(null);
   const [loadingGfgStats, setLoadingGfgStats] = useState(false);
 
-  // Set origin on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setSiteOrigin(window.location.origin);
-    }
-  }, []);
-
   // Redirect to login if user is not authenticated and hasn't chosen guest mode
   useEffect(() => {
     if (!loading && !user && !isGuest) {
       router.push("/login");
     }
   }, [user, loading, isGuest, router]);
-
-  // Load initial form values from profile state
-  useEffect(() => {
-    if (profile) {
-      setName(profile.displayName || "");
-      setLeetcodeUser(profile.leetcodeUsername || "");
-      setGfgUser(profile.gfgUsername || "");
-      
-      if (profile.gfgUsername) {
-        fetchGfgStats(profile.gfgUsername);
-      }
-    }
-  }, [profile]);
 
   const fetchGfgStats = async (username: string) => {
     if (!username) return;
@@ -80,6 +65,22 @@ export default function ProfilePage() {
       setLoadingGfgStats(false);
     }
   };
+
+  // Load initial form values from profile state
+  useEffect(() => {
+    if (profile) {
+      const timer = setTimeout(() => {
+        setName(profile.displayName || "");
+        setLeetcodeUser(profile.leetcodeUsername || "");
+        setGfgUser(profile.gfgUsername || "");
+        
+        if (profile.gfgUsername) {
+          fetchGfgStats(profile.gfgUsername);
+        }
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [profile]);
 
   if (loading) {
     return (
@@ -188,7 +189,7 @@ export default function ProfilePage() {
       const newSolvedMap = { ...currentSolvedMap };
       let countMatched = 0;
 
-      submissions.forEach((sub: any) => {
+      submissions.forEach((sub: { titleSlug: string; timestamp: string }) => {
         const problemId = slugToIdMap[sub.titleSlug];
         if (problemId) {
           if (!newSolvedMap[problemId]?.solved) {
@@ -286,7 +287,7 @@ export default function ProfilePage() {
       let countMatched = 0;
       const dateStr = new Date().toISOString().split("T")[0];
 
-      solvedProblemsList.forEach((prob: any) => {
+      solvedProblemsList.forEach((prob: { questionUrl: string }) => {
         const urlSlug = cleanSlug(prob.questionUrl);
         if (urlSlug) {
           const problemId = slugToIdMap[urlSlug];

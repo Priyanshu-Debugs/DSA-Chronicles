@@ -91,8 +91,9 @@ export async function POST(req: Request) {
       success: true,
       message: `Successfully synced! Solved: ${matchedProblemId}`,
     });
-  } catch (err: any) {
-    console.error("API sync error:", err);
-    return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });
+  } catch (err: unknown) {
+    const error = err as Error;
+    console.error("API sync error:", error);
+    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
   }
 }

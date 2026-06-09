@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import Link from "next/link";
 
 export default function LoginPage() {
   const {
@@ -35,8 +34,12 @@ export default function LoginPage() {
   // Set the error message if a redirect error occurred
   useEffect(() => {
     if (redirectError) {
-      setErrorMsg(redirectError);
-      clearRedirectError();
+      const err = redirectError;
+      const timer = setTimeout(() => {
+        setErrorMsg(err);
+        clearRedirectError();
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [redirectError, clearRedirectError]);
 
@@ -66,9 +69,10 @@ export default function LoginPage() {
         await signInWithEmail(email, password);
       }
       router.push("/");
-    } catch (err: any) {
-      console.error(err);
-      let message = err.message || "An authentication error occurred.";
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      console.error(error);
+      let message = error.message || "An authentication error occurred.";
       if (
         message.includes("auth/invalid-credential") ||
         message.includes("auth/wrong-password")
@@ -87,18 +91,29 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = () => {
     setErrorMsg("");
-    setSubmitting(true);
     try {
-      await signInWithGoogle();
-      router.push("/");
-    } catch (err: any) {
+      const promise = signInWithGoogle();
+      setSubmitting(true);
+      promise
+        .then(() => {
+          router.push("/");
+        })
+        .catch((err: unknown) => {
+          console.error(err);
+          const error = err as { code?: string; message?: string };
+          if (error.code !== "auth/popup-closed-by-user") {
+            setErrorMsg(error.message || "Google Sign-In failed.");
+          }
+        })
+        .finally(() => {
+          setSubmitting(false);
+        });
+    } catch (err: unknown) {
       console.error(err);
-      if (err.code !== "auth/popup-closed-by-user") {
-        setErrorMsg(err.message || "Google Sign-In failed.");
-      }
-    } finally {
+      const error = err as { message?: string };
+      setErrorMsg(error.message || "Failed to initialize Google Sign-In.");
       setSubmitting(false);
     }
   };

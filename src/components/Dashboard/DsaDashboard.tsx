@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Step, Problem, a2zDsaSheetData } from "@/data/a2zDsaSheet";
+import { Problem, a2zDsaSheetData } from "@/data/a2zDsaSheet";
 import ProgressGrid from "@/components/Tracker/ProgressGrid";
 import NotebookEditor from "@/components/Notebook/NotebookEditor";
 import { useAuth } from "@/context/AuthContext";
