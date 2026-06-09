@@ -325,11 +325,11 @@ export default function ProfilePage() {
   const userscriptCode = `// ==UserScript==
 // @name         DSA Chronicles Real-time Sync
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  Syncs LeetCode and GeeksforGeeks solved problems to your DSA Chronicles Tracker in real-time.
 // @author       Priyanshu
 // @match        https://leetcode.com/problems/*
-// @match        https://www.geeksforgeeks.org/problems/*
+// @match        https://*.geeksforgeeks.org/problems/*
 // @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
 // @run-at       document-start
