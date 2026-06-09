@@ -325,12 +325,14 @@ export default function ProfilePage() {
   const userscriptCode = `// ==UserScript==
 // @name         DSA Chronicles Real-time Sync
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Syncs LeetCode and GeeksforGeeks solved problems to your DSA Chronicles Tracker in real-time.
 // @author       Priyanshu
 // @match        https://leetcode.com/problems/*
 // @match        https://www.geeksforgeeks.org/problems/*
 // @grant        GM_xmlhttpRequest
+// @grant        unsafeWindow
+// @run-at       document-start
 // @connect      *
 // ==/UserScript==
 
@@ -371,15 +373,52 @@ export default function ProfilePage() {
         });
     }
 
-    if (window.location.host.includes("leetcode.com")) {
-        const originOpen = XMLHttpRequest.prototype.open;
-        XMLHttpRequest.prototype.open = function(...args) {
+    const win = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+
+    if (win.location.host.includes("leetcode.com")) {
+        // 1. Intercept fetch (used by modern LeetCode)
+        const originalFetch = win.fetch;
+        win.fetch = function(...args) {
+            const request = args[0];
+            let url = "";
+            if (typeof request === "string") {
+                url = request;
+            } else if (typeof win.URL === "function" && request instanceof win.URL) {
+                url = request.href;
+            } else if (request && typeof request === "object" && request.url) {
+                url = request.url;
+            }
+
+            if (url && url.includes("/submissions/detail/") && url.includes("/check/")) {
+                return originalFetch.apply(this, args).then(async (response) => {
+                    try {
+                        const clonedResponse = response.clone();
+                        const data = await clonedResponse.json();
+                        if (data && data.status_msg === "Accepted") {
+                            const pathParts = win.location.pathname.split("/problems/");
+                            if (pathParts.length > 1) {
+                                const slug = pathParts[1].split("/")[0];
+                                syncSubmission("leetcode", slug);
+                            }
+                        }
+                    } catch (e) {
+                        console.error("[DSA Chronicles] Fetch parsing error:", e);
+                    }
+                    return response;
+                });
+            }
+            return originalFetch.apply(this, args);
+        };
+
+        // 2. Intercept XMLHttpRequest (fallback)
+        const originOpen = win.XMLHttpRequest.prototype.open;
+        win.XMLHttpRequest.prototype.open = function(...args) {
             this.addEventListener('load', function() {
                 if (this.responseURL && this.responseURL.includes("/submissions/detail/") && this.responseURL.includes("/check/")) {
                     try {
                         const data = JSON.parse(this.responseText);
                         if (data.status_msg === "Accepted") {
-                            const pathParts = window.location.pathname.split("/problems/");
+                            const pathParts = win.location.pathname.split("/problems/");
                             if (pathParts.length > 1) {
                                 const slug = pathParts[1].split("/")[0];
                                 syncSubmission("leetcode", slug);
@@ -392,7 +431,7 @@ export default function ProfilePage() {
         };
     }
 
-    if (window.location.host.includes("geeksforgeeks.org")) {
+    if (win.location.host.includes("geeksforgeeks.org")) {
         const observer = new MutationObserver(() => {
             const solvedElement = document.querySelector(".quantum-alert-success") || 
                                  document.querySelector(".problems_correct_ans__") || 
@@ -400,12 +439,12 @@ export default function ProfilePage() {
                                  Array.from(document.querySelectorAll("div")).find(el => el.textContent.toLowerCase().includes("problem solved successfully"));
             
             if (solvedElement) {
-                const pathParts = window.location.pathname.split("/problems/");
+                const pathParts = win.location.pathname.split("/problems/");
                 if (pathParts.length > 1) {
                     const slug = pathParts[1].split("/")[0];
                     const solvedKey = "dsa_synced_" + slug;
-                    if (!window[solvedKey]) {
-                        window[solvedKey] = true;
+                    if (!win[solvedKey]) {
+                        win[solvedKey] = true;
                         syncSubmission("gfg", slug);
                     }
                 }
