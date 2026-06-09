@@ -10,6 +10,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
+  getRedirectResult,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
@@ -36,6 +37,8 @@ interface AuthContextType {
   isFirebaseAvailable: boolean;
   isGuest: boolean;
   continueAsGuest: () => void;
+  redirectError: string | null;
+  clearRedirectError: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,8 +48,11 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isGuest, setIsGuest] = useState<boolean>(false);
+  const [redirectError, setRedirectError] = useState<string | null>(null);
 
   const isFirebaseAvailable = !!auth;
+
+  const clearRedirectError = () => setRedirectError(null);
 
   useEffect(() => {
     const guest = localStorage.getItem("dsa_guest_mode") === "true";
@@ -56,6 +62,18 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
       setLoading(false);
       return;
     }
+
+    // Capture and handle redirect login results
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          console.log("Google redirect sign-in completed successfully:", result.user);
+        }
+      })
+      .catch((err) => {
+        console.error("Firebase redirect sign-in error:", err);
+        setRedirectError(err.message || "Authentication redirect failed.");
+      });
 
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
@@ -184,6 +202,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
         isFirebaseAvailable,
         isGuest,
         continueAsGuest,
+        redirectError,
+        clearRedirectError,
       }}
     >
       {children}

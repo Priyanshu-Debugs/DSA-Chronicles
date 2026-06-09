@@ -14,6 +14,8 @@ export default function LoginPage() {
     signUpWithEmail,
     isFirebaseAvailable,
     continueAsGuest,
+    redirectError,
+    clearRedirectError,
   } = useAuth();
   const router = useRouter();
 
@@ -29,6 +31,14 @@ export default function LoginPage() {
       router.push("/");
     }
   }, [user, router]);
+
+  // Set the error message if a redirect error occurred
+  useEffect(() => {
+    if (redirectError) {
+      setErrorMsg(redirectError);
+      clearRedirectError();
+    }
+  }, [redirectError, clearRedirectError]);
 
   if (loading) {
     return (
