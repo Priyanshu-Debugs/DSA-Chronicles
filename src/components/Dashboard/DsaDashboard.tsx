@@ -13,7 +13,7 @@ interface DsaDashboardProps {
 }
 
 export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, isGuest } = useAuth();
   
   const [solvedMap, setSolvedMap] = useState<Record<string, { solved: boolean; date?: string }>>({});
   const [notesMap, setNotesMap] = useState<Record<string, string>>({});
@@ -34,6 +34,182 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
     filteredSteps.length > 0 ? filteredSteps[0].stepId : null
   );
   const [editingProblem, setEditingProblem] = useState<Problem | null>(null);
+
+  // LeetCode states
+  const [lcStats, setLcStats] = useState<{
+    ranking?: number;
+    totalSolved?: number;
+    easySolved?: number;
+    mediumSolved?: number;
+    hardSolved?: number;
+    avatar?: string | null;
+    recentSolved?: Array<{ title: string; titleSlug: string; timestamp: string; lang: string }>;
+    loading: boolean;
+    error: boolean;
+  } | null>(null);
+
+  // GFG states
+  const [gfgStats, setGfgStats] = useState<{
+    fullName?: string;
+    profilePicture?: string;
+    institute?: string;
+    instituteRank?: string;
+    codingScore?: number;
+    totalProblemsSolved?: number;
+    recentSolved?: Array<{ question: string; questionUrl: string; difficulty: string }>;
+    loading: boolean;
+    error: boolean;
+  } | null>(null);
+
+  // Fetch coding profiles stats in real-time
+  useEffect(() => {
+    if (authLoading) return;
+    
+    // LeetCode Stats Fetching
+    const fetchLeetCodeStats = async (username: string) => {
+      setLcStats({ loading: true, error: false });
+      
+      const providers = [
+        "https://leetcode-stats.tashif.codes",
+        "https://alfa-leetcode-api.vercel.app"
+      ];
+
+      for (const baseUrl of providers) {
+        try {
+          // Fetch solved stats from the main user endpoint
+          const solvedRes = await fetch(`${baseUrl}/${username}`);
+          if (!solvedRes.ok) continue;
+          const solvedData = await solvedRes.json();
+
+          // Fetch basic profile for avatar
+          let avatarUrl: string | null = null;
+          let submissionsList: any[] = [];
+          try {
+            const profileRes = await fetch(`${baseUrl}/${username}/profile`);
+            if (profileRes.ok) {
+              const profileData = await profileRes.json();
+              avatarUrl = profileData.profile?.userAvatar || null;
+              submissionsList = profileData.recentSubmissions || [];
+            }
+          } catch (profileErr) {
+            // Silence profile specific errors to allow submissions fallback
+          }
+
+          // If submissionsList is empty, attempt to fetch from direct submission endpoint
+          if (submissionsList.length === 0) {
+            try {
+              const submissionRes = await fetch(`${baseUrl}/${username}/submission?limit=30`);
+              if (submissionRes.ok) {
+                const submissionData = await submissionRes.json();
+                submissionsList = submissionData.submission || submissionData.recentSubmissions || [];
+              }
+            } catch (subErr) {
+              // Silence submission specific errors
+            }
+          }
+
+          // Extract last 5-10 solved questions (Accepted status, unique problems)
+          const acceptedSubmissions = submissionsList.filter(
+            (sub: any) => sub.statusDisplay === "Accepted"
+          );
+
+          const uniqueSolved: Array<{ title: string; titleSlug: string; timestamp: string; lang: string }> = [];
+          const seenTitles = new Set<string>();
+          for (const sub of acceptedSubmissions) {
+            if (!seenTitles.has(sub.title)) {
+              seenTitles.add(sub.title);
+              uniqueSolved.push({
+                title: sub.title,
+                titleSlug: sub.titleSlug,
+                timestamp: sub.timestamp,
+                lang: sub.lang,
+              });
+            }
+          }
+          const recentSolved = uniqueSolved.slice(0, 10);
+
+          setLcStats({
+            ranking: solvedData.ranking || 0,
+            totalSolved: solvedData.totalSolved || 0,
+            easySolved: solvedData.easySolved || 0,
+            mediumSolved: solvedData.mediumSolved || 0,
+            hardSolved: solvedData.hardSolved || 0,
+            avatar: avatarUrl,
+            recentSolved,
+            loading: false,
+            error: false,
+          });
+          return; // Successfully fetched from this provider!
+        } catch (err) {
+          console.warn(`Failed to fetch LeetCode stats from ${baseUrl}:`, err);
+        }
+      }
+
+      // If all providers fail
+      setLcStats({ loading: false, error: true });
+    };
+
+    // GeeksforGeeks Stats Fetching
+    const fetchGfgStats = async (username: string) => {
+      setGfgStats({ loading: true, error: false });
+      try {
+        const profileRes = await fetch(`https://gfg-stats.tashif.codes/${username}/profile`);
+        if (!profileRes.ok) {
+          throw new Error("GFG profile stats API error");
+        }
+        const profileData = await profileRes.json();
+
+        // Fetch solved problems
+        let recentSolved: Array<{ question: string; questionUrl: string; difficulty: string }> = [];
+        try {
+          const solvedProblemsRes = await fetch(`https://gfg-stats.tashif.codes/${username}/solved-problems`);
+          if (solvedProblemsRes.ok) {
+            const solvedProblemsData = await solvedProblemsRes.json();
+            const rawProblems = solvedProblemsData.problems || [];
+            
+            // Remove duplicates if any
+            const uniqueProblems: any[] = [];
+            const seenQuestions = new Set<string>();
+            for (const p of rawProblems) {
+              if (p.question && !seenQuestions.has(p.question)) {
+                seenQuestions.add(p.question);
+                uniqueProblems.push({
+                  question: p.question,
+                  questionUrl: p.questionUrl,
+                  difficulty: p.difficulty || "medium",
+                });
+              }
+            }
+            recentSolved = uniqueProblems.slice(0, 10);
+          }
+        } catch (solvedErr) {
+          console.error("Failed to fetch GFG solved problems:", solvedErr);
+        }
+
+        setGfgStats({
+          ...profileData,
+          recentSolved,
+          loading: false,
+          error: false,
+        });
+      } catch (err) {
+        console.error("Failed to fetch GFG stats:", err);
+        setGfgStats({ loading: false, error: true });
+      }
+    };
+
+    if (profile?.leetcodeUsername) {
+      fetchLeetCodeStats(profile.leetcodeUsername);
+    } else {
+      setLcStats(null);
+    }
+
+    if (profile?.gfgUsername) {
+      fetchGfgStats(profile.gfgUsername);
+    } else {
+      setGfgStats(null);
+    }
+  }, [profile, authLoading]);
 
   // Sync state between client and Firestore / LocalStorage
   useEffect(() => {
@@ -229,6 +405,16 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
     return "DSA CHRONICLES";
   };
 
+  const formatTimestamp = (timestampStr: string) => {
+    const ts = parseInt(timestampStr);
+    if (isNaN(ts)) return "";
+    const date = new Date(ts * 1000);
+    const dd = String(date.getDate()).padStart(2, "0");
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const yyyy = date.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-8">
       {/* App Header Banner */}
@@ -318,6 +504,261 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
           <ProgressGrid solvedMap={solvedMap} />
         </div>
       </section>
+
+      {/* Coding Profiles Dashboard Integration */}
+      {!authLoading && (profile?.leetcodeUsername || profile?.gfgUsername) && (
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* LeetCode Profile Card */}
+          {profile?.leetcodeUsername && (
+            <div className="bg-[#1a1a1a] text-white border-4 border-black p-6 shadow-neo rounded-xl space-y-4">
+              <div className="flex justify-between items-center border-b-2 border-gray-800 pb-3">
+                <div className="flex items-center gap-3">
+                  {lcStats?.avatar ? (
+                    <img src={lcStats.avatar} alt="LeetCode Avatar" className="w-12 h-12 rounded-lg border-2 border-white object-cover" />
+                  ) : (
+                    <div className="w-12 h-12 bg-gray-700 text-white rounded-lg border-2 border-white flex items-center justify-center font-black text-xl">
+                      {profile?.leetcodeUsername?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="text-xl font-black tracking-tight text-neoYellow uppercase">LeetCode Profile</h3>
+                    <a
+                      href={`https://leetcode.com/u/${profile?.leetcodeUsername}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-bold text-gray-400 hover:text-white underline"
+                    >
+                      @{profile?.leetcodeUsername}
+                    </a>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-gray-500 uppercase block font-black">Global Rank</span>
+                  <span className="text-lg font-black text-white">
+                    {lcStats?.loading ? "Loading..." : lcStats?.error ? "N/A" : `#${lcStats?.ranking?.toLocaleString() || "N/A"}`}
+                  </span>
+                </div>
+              </div>
+
+              {lcStats?.loading ? (
+                <div className="py-4 text-center text-xs font-bold uppercase animate-pulse text-gray-400">Loading LeetCode stats...</div>
+              ) : lcStats?.error ? (
+                <div className="py-4 text-center text-xs font-bold uppercase text-neoRed">Failed to load LeetCode stats.</div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                  <div className="text-center sm:text-left bg-gray-900 border-2 border-black p-4 rounded-lg">
+                    <span className="text-2xl font-black text-neoYellow">{lcStats?.totalSolved}</span>
+                    <span className="text-xs text-gray-400 block font-bold uppercase">Total Solved</span>
+                  </div>
+                  
+                  <div className="space-y-2 text-xs font-bold">
+                    {/* Easy */}
+                    <div>
+                      <div className="flex justify-between mb-0.5">
+                        <span className="text-[#00b8a3]">Easy</span>
+                        <span>{lcStats?.easySolved}</span>
+                      </div>
+                      <div className="w-full bg-gray-800 h-2.5 rounded-full overflow-hidden border border-black">
+                        <div
+                          className="bg-[#00b8a3] h-full"
+                          style={{
+                            width: `${lcStats?.totalSolved ? (lcStats.easySolved! / lcStats.totalSolved!) * 100 : 0}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Medium */}
+                    <div>
+                      <div className="flex justify-between mb-0.5">
+                        <span className="text-[#ffc01e]">Medium</span>
+                        <span>{lcStats?.mediumSolved}</span>
+                      </div>
+                      <div className="w-full bg-gray-800 h-2.5 rounded-full overflow-hidden border border-black">
+                        <div
+                          className="bg-[#ffc01e] h-full"
+                          style={{
+                            width: `${lcStats?.totalSolved ? (lcStats.mediumSolved! / lcStats.totalSolved!) * 100 : 0}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Hard */}
+                    <div>
+                      <div className="flex justify-between mb-0.5">
+                        <span className="text-[#ef4743]">Hard</span>
+                        <span>{lcStats?.hardSolved}</span>
+                      </div>
+                      <div className="w-full bg-gray-800 h-2.5 rounded-full overflow-hidden border border-black">
+                        <div
+                          className="bg-[#ef4743] h-full"
+                          style={{
+                            width: `${lcStats?.totalSolved ? (lcStats.hardSolved! / lcStats.totalSolved!) * 100 : 0}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Recently Solved Questions */}
+              {!lcStats?.loading && !lcStats?.error && lcStats?.recentSolved && lcStats.recentSolved.length > 0 && (
+                <div className="border-t-2 border-gray-800 pt-4 mt-2">
+                  <h4 className="text-xs font-black uppercase text-neoYellow tracking-wide mb-3 flex items-center justify-between">
+                    <span>Recently Solved</span>
+                    <span className="bg-gray-800 text-[10px] text-gray-400 px-2 py-0.5 rounded border border-black font-mono">
+                      Last {lcStats.recentSolved.length}
+                    </span>
+                  </h4>
+                  <div className="max-h-48 overflow-y-auto space-y-2 pr-1 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
+                    {lcStats.recentSolved.map((sub, idx) => (
+                      <a
+                        key={idx}
+                        href={`https://leetcode.com/problems/${sub.titleSlug}/`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex justify-between items-center bg-gray-950 border border-black hover:border-neoYellow p-2 rounded text-xs font-semibold group transition-all"
+                      >
+                        <span className="text-gray-300 group-hover:text-white truncate max-w-[65%]">
+                          {sub.title}
+                        </span>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className="bg-gray-800 text-[9px] text-[#00b8a3] px-1.5 py-0.5 rounded font-mono uppercase font-bold">
+                            {sub.lang}
+                          </span>
+                          <span className="text-[10px] text-gray-500 font-mono">
+                            {formatTimestamp(sub.timestamp)}
+                          </span>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* GeeksforGeeks Profile Card */}
+          {profile?.gfgUsername && (
+            <div className="bg-[#f0f9f4] text-[#0f5132] border-4 border-black p-6 shadow-neo rounded-xl space-y-4">
+              <div className="flex justify-between items-center border-b-2 border-green-200 pb-3">
+                <div className="flex items-center gap-3">
+                  {gfgStats?.profilePicture ? (
+                    <img src={gfgStats.profilePicture} alt="GFG Avatar" className="w-12 h-12 rounded-lg border-2 border-black object-cover shadow-neo-sm bg-white" />
+                  ) : (
+                    <div className="w-12 h-12 bg-[#2f8d46] text-white rounded-lg border-2 border-black flex items-center justify-center font-black text-xl shadow-neo-sm">
+                      {profile?.gfgUsername?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="text-xl font-black tracking-tight text-[#2f8d46] uppercase">GFG Profile</h3>
+                    <a
+                      href={`https://www.geeksforgeeks.org/user/${profile?.gfgUsername}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-bold text-[#0f5132]/75 hover:text-[#0f5132] underline"
+                    >
+                      @{profile?.gfgUsername}
+                    </a>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-green-700/60 uppercase block font-black">Coding Score</span>
+                  <span className="text-lg font-black text-[#2f8d46]">
+                    {gfgStats?.loading ? "Loading..." : gfgStats?.error ? "N/A" : gfgStats?.codingScore || 0}
+                  </span>
+                </div>
+              </div>
+
+              {gfgStats?.loading ? (
+                <div className="py-4 text-center text-xs font-bold uppercase animate-pulse text-green-700/60">Loading GFG stats...</div>
+              ) : gfgStats?.error ? (
+                <div className="py-4 text-center text-xs font-bold uppercase text-neoRed">Failed to load GFG stats.</div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                  <div className="space-y-2">
+                    <div className="bg-white border-2 border-black p-3 rounded-lg flex justify-between items-center shadow-neo-sm">
+                      <span className="text-xs font-black uppercase text-gray-500 font-bold">Solved</span>
+                      <span className="text-lg font-black text-black">{gfgStats?.totalProblemsSolved || 0}</span>
+                    </div>
+                    <div className="bg-white border-2 border-black p-3 rounded-lg flex justify-between items-center shadow-neo-sm">
+                      <span className="text-xs font-black uppercase text-gray-500 font-bold">Inst. Rank</span>
+                      <span className="text-lg font-black text-black">{gfgStats?.instituteRank || "N/A"}</span>
+                    </div>
+                  </div>
+
+                  <div className="text-xs font-bold text-[#0f5132]/85 bg-white border-2 border-black p-3.5 rounded-lg shadow-neo-sm leading-snug space-y-1">
+                    <span className="text-[9px] text-gray-500 uppercase block font-black">Institution</span>
+                    <span className="font-extrabold text-black block truncate max-w-full">
+                      {gfgStats?.institute || "No Institution Linked"}
+                    </span>
+                    <span className="text-[9px] text-gray-400 block font-normal leading-tight">
+                      * Real-time metrics from GFG Profile
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Recently Solved Questions */}
+              {!gfgStats?.loading && !gfgStats?.error && gfgStats?.recentSolved && gfgStats.recentSolved.length > 0 && (
+                <div className="border-t-2 border-green-200 pt-4 mt-2">
+                  <h4 className="text-xs font-black uppercase text-[#2f8d46] tracking-wide mb-3 flex items-center justify-between">
+                    <span>Recently Solved</span>
+                    <span className="bg-white text-[10px] text-gray-500 px-2 py-0.5 rounded border border-black font-mono">
+                      Last {gfgStats.recentSolved.length}
+                    </span>
+                  </h4>
+                  <div className="max-h-48 overflow-y-auto space-y-2 pr-1 scrollbar-thin scrollbar-thumb-green-200 scrollbar-track-transparent">
+                    {gfgStats.recentSolved.map((sub, idx) => (
+                      <a
+                        key={idx}
+                        href={sub.questionUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex justify-between items-center bg-white border border-black hover:border-[#2f8d46] p-2 rounded text-xs font-semibold group transition-all"
+                      >
+                        <span className="text-gray-700 group-hover:text-black truncate max-w-[75%]">
+                          {sub.question}
+                        </span>
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono uppercase font-bold flex-shrink-0 ${
+                          sub.difficulty?.toLowerCase() === "easy" ? "bg-green-100 text-green-700" :
+                          sub.difficulty?.toLowerCase() === "medium" ? "bg-yellow-100 text-yellow-800" :
+                          sub.difficulty?.toLowerCase() === "hard" ? "bg-red-100 text-red-700" :
+                          "bg-gray-100 text-gray-700"
+                        }`}>
+                          {sub.difficulty}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Prompt to connect coding profiles if none connected */}
+      {!authLoading && !isGuest && user && !profile?.leetcodeUsername && !profile?.gfgUsername && (
+        <section className="bg-white border-4 border-black p-6 shadow-neo rounded-xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="text-xl font-black uppercase mb-1">🔥 Boost Your Dashboard!</h3>
+              <p className="text-sm font-bold text-gray-700">
+                Link your LeetCode and GeeksforGeeks profiles to track your real-time coding scores, total problems solved, and rankings directly on your dashboard.
+              </p>
+            </div>
+            <Link
+              href="/profile"
+              className="bg-neoYellow border-4 border-black text-black font-black text-xs py-2.5 px-5 rounded-md shadow-neo hover:bg-yellow-300 transition-all uppercase whitespace-nowrap inline-block hover:-translate-y-0.5 neo-clickable"
+            >
+              Link Profiles Now
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Main Track Accordion */}
       <section className="space-y-4">
