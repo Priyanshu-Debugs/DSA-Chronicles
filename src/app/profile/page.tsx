@@ -151,6 +151,10 @@ export default function ProfilePage() {
         step.lessons.forEach((l) => {
           l.topics.forEach((t) => {
             t.problems.forEach((p) => {
+              // Prefer explicit slug, fall back to URL extraction
+              if (p.leetcodeSlug) {
+                slugToIdMap[p.leetcodeSlug] = p.id;
+              }
               const slug = getLeetCodeSlug(p.leetcodeUrl);
               if (slug) {
                 slugToIdMap[slug] = p.id;
@@ -189,8 +193,28 @@ export default function ProfilePage() {
       const newSolvedMap = { ...currentSolvedMap };
       let countMatched = 0;
 
-      submissions.forEach((sub: { titleSlug: string; timestamp: string }) => {
-        const problemId = slugToIdMap[sub.titleSlug];
+      // Build name-based fallback index
+      const nameToIdMap: Record<string, string> = {};
+      a2zDsaSheetData.forEach((step) => {
+        step.lessons.forEach((l) => {
+          l.topics.forEach((t) => {
+            t.problems.forEach((p) => {
+              const normalizedName = p.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+              nameToIdMap[normalizedName] = p.id;
+            });
+          });
+        });
+      });
+
+      submissions.forEach((sub: { titleSlug: string; title?: string; timestamp: string }) => {
+        let problemId = slugToIdMap[sub.titleSlug];
+        
+        // Fallback: try name-based match if slug didn't match
+        if (!problemId && sub.title) {
+          const normalizedTitle = sub.title.toLowerCase().replace(/[^a-z0-9]/g, "");
+          problemId = nameToIdMap[normalizedTitle];
+        }
+        
         if (problemId) {
           if (!newSolvedMap[problemId]?.solved) {
             const timestampMs = parseInt(sub.timestamp) * 1000;
@@ -236,24 +260,35 @@ export default function ProfilePage() {
 
     try {
       const slugToIdMap: Record<string, string> = {};
+      const nameToIdMap: Record<string, string> = {};
       
       const cleanSlug = (url?: string) => {
         if (!url) return null;
         const parts = url.toLowerCase().split("/problems/");
         if (parts.length > 1) {
-          return parts[1].split("/")[0].trim();
+          // Remove query params, hash fragments, and trailing slashes/numbers
+          return parts[1].split("/")[0].split("?")[0].split("#")[0].trim();
         }
         return null;
       };
+
+      const normalizeName = (name: string) =>
+        name.toLowerCase().replace(/[^a-z0-9]/g, "");
 
       a2zDsaSheetData.forEach((step) => {
         step.lessons.forEach((l) => {
           l.topics.forEach((t) => {
             t.problems.forEach((p) => {
+              // Prefer explicit slug, fall back to URL extraction
+              if (p.gfgSlug) {
+                slugToIdMap[p.gfgSlug.toLowerCase()] = p.id;
+              }
               const slug = cleanSlug(p.gfgUrl);
               if (slug) {
                 slugToIdMap[slug] = p.id;
               }
+              // Name-based fallback
+              nameToIdMap[normalizeName(p.name)] = p.id;
             });
           });
         });
@@ -287,19 +322,26 @@ export default function ProfilePage() {
       let countMatched = 0;
       const dateStr = new Date().toISOString().split("T")[0];
 
-      solvedProblemsList.forEach((prob: { questionUrl: string }) => {
+      solvedProblemsList.forEach((prob: { question?: string; questionUrl: string }) => {
         const urlSlug = cleanSlug(prob.questionUrl);
+        let problemId: string | undefined;
+        
+        // Try slug match first
         if (urlSlug) {
-          const problemId = slugToIdMap[urlSlug];
-          if (problemId) {
-            if (!newSolvedMap[problemId]?.solved) {
-              newSolvedMap[problemId] = {
-                solved: true,
-                date: dateStr,
-              };
-              countMatched++;
-            }
-          }
+          problemId = slugToIdMap[urlSlug];
+        }
+        
+        // Fallback to name-based match
+        if (!problemId && prob.question) {
+          problemId = nameToIdMap[normalizeName(prob.question)];
+        }
+        
+        if (problemId && !newSolvedMap[problemId]?.solved) {
+          newSolvedMap[problemId] = {
+            solved: true,
+            date: dateStr,
+          };
+          countMatched++;
         }
       });
 

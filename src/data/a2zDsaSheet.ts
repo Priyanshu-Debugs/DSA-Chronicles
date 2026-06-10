@@ -3,6 +3,10 @@ export interface Problem {
   name: string;
   leetcodeUrl: string;
   gfgUrl: string;
+  /** Explicit LeetCode problem slug for matching when leetcodeUrl doesn't point to leetcode.com */
+  leetcodeSlug?: string;
+  /** Explicit GFG problem slug for matching when gfgUrl uses a different domain/format */
+  gfgSlug?: string;
 }
 
 export interface Topic {
@@ -40,13 +44,15 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "0_largest_element_in_an_array",
                 "name": "Largest Element in an Array",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/find-the-largest-element-in-an-array/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/largest-element-in-array4009/0"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/largest-element-in-array4009/0",
+                "gfgSlug": "largest-element-in-array4009"
               },
               {
                 "id": "1_second_largest_element_in_an_array_without_sorting",
                 "name": "Second Largest Element in an Array without sorting",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/find-second-smallest-and-second-largest-element-in-an-array/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/second-largest3735/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/second-largest3735/1",
+                "gfgSlug": "second-largest3735"
               },
               {
                 "id": "2_check_if_the_array_is_sorted",
@@ -82,13 +88,16 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "7_linear_search",
                 "name": "Linear Search",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/linear-search-in-c/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/who-will-win-1587115621/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/who-will-win-1587115621/1",
+                "gfgSlug": "who-will-win-1587115621"
               },
               {
                 "id": "8_find_the_union_and_intersection_of_two_sorted_arrays",
                 "name": "Find the Union and intersection of two sorted arrays",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/intersection-of-two-sorted-arrays/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/union-of-two-sorted-arrays-1587115621/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/union-of-two-sorted-arrays-1587115621/1",
+                "leetcodeSlug": "intersection-of-two-arrays",
+                "gfgSlug": "union-of-two-sorted-arrays-1587115621"
               },
               {
                 "id": "9_find_missing_number_in_an_array",
@@ -172,7 +181,9 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "4_print_subarray_with_maximum_subarray_sum_(extended_version_of_above_problem)",
                 "name": "Print subarray with maximum subarray sum (extended version of above problem)",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/subarray-with-given-sum/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/max-sum-in-sub-arrays0824/0?category="
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/max-sum-in-sub-arrays0824/0?category=",
+                "leetcodeSlug": "maximum-subarray",
+                "gfgSlug": "max-sum-in-sub-arrays0824"
               },
               {
                 "id": "5_stock_buy_and_sell",
@@ -196,7 +207,8 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "8_leaders_in_an_array_problem",
                 "name": "Leaders in an Array problem",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/leaders-in-an-array/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/leaders-in-an-array-1587115620/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/leaders-in-an-array-1587115620/1",
+                "gfgSlug": "leaders-in-an-array-1587115620"
               },
               {
                 "id": "9_longest_consecutive_sequence_in_an_array",
@@ -262,13 +274,15 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "4_largest_subarray_with_0_sum",
                 "name": "Largest Subarray with 0 Sum",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/length-of-the-longest-subarray-with-zero-sum/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/largest-subarray-with-0-sum/1?category[]=Hash&category[]=Hash&company[]=Amazon&company[]=Amazon&page=1&query=category[]Hashcompany[]Amazonpage1company[]Amazoncategory[]Hash"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/largest-subarray-with-0-sum/1?category[]=Hash&category[]=Hash&company[]=Amazon&company[]=Amazon&page=1&query=category[]Hashcompany[]Amazonpage1company[]Amazoncategory[]Hash",
+                "gfgSlug": "largest-subarray-with-0-sum"
               },
               {
                 "id": "5_count_number_of_subarrays_with_given_xor_k",
                 "name": "Count number of subarrays with given xor K",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/count-the-number-of-subarrays-with-given-xor-k/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/subsets-with-xor-value2023/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/subsets-with-xor-value2023/1",
+                "gfgSlug": "subsets-with-xor-value2023"
               },
               {
                 "id": "6_merge_overlapping_subintervals",
@@ -286,13 +300,16 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "8_find_the_repeating_and_missing_number",
                 "name": "Find the repeating and missing number",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/find-the-repeating-and-missing-numbers/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/find-missing-and-repeating2512/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/find-missing-and-repeating2512/1",
+                "gfgSlug": "find-missing-and-repeating2512"
               },
               {
                 "id": "9_count_inversions",
                 "name": "Count Inversions",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/count-inversions-in-an-array/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/inversion-of-array-1587115620/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/inversion-of-array-1587115620/1",
+                "leetcodeSlug": "count-of-smaller-numbers-after-self",
+                "gfgSlug": "inversion-of-array-1587115620"
               },
               {
                 "id": "10_reverse_pairs",
@@ -364,7 +381,9 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "6_count_occurrences_of_a_number_in_a_sorted_array_with_duplicates_",
                 "name": "Count occurrences of a number in a sorted array with duplicates ",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/count-occurrences-in-sorted-array/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/number-of-occurrence2259/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/number-of-occurrence2259/1",
+                "leetcodeSlug": "find-first-and-last-position-of-element-in-sorted-array",
+                "gfgSlug": "number-of-occurrence2259"
               },
               {
                 "id": "7_find_peak_element",
@@ -400,7 +419,8 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "12_find_kth_element_of_two_sorted_arrays",
                 "name": "Find kth element of two sorted arrays",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/k-th-element-of-two-sorted-arrays/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/k-th-element-of-two-sorted-array1317/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/k-th-element-of-two-sorted-array1317/1",
+                "gfgSlug": "k-th-element-of-two-sorted-array1317"
               },
               {
                 "id": "13_find_out_how_many_times_has_an_array_been_rotated",
@@ -460,7 +480,8 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "1_find_the_nth_root_of_a_number_using_binary_search",
                 "name": "Find the Nth root of a number using binary search",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/nth-root-of-a-number-using-binary-search/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/find-nth-root-of-m5843/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/find-nth-root-of-m5843/1",
+                "gfgSlug": "find-nth-root-of-m5843"
               },
               {
                 "id": "2_koko_eating_bananas",
@@ -496,7 +517,8 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "7_aggressive_cows",
                 "name": "Aggressive Cows",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/aggressive-cows-detailed-solution/",
-                "gfgUrl": ""
+                "gfgUrl": "",
+                "leetcodeSlug": "magnetic-force-between-two-balls"
               },
               {
                 "id": "8_book_allocation_problem",
@@ -532,7 +554,8 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "13_kth_element_of_2_sorted_arrays",
                 "name": "Kth element of 2 sorted arrays",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/k-th-element-of-two-sorted-arrays/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/k-th-element-of-two-sorted-array1317/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/k-th-element-of-two-sorted-array1317/1",
+                "gfgSlug": "k-th-element-of-two-sorted-array1317"
               }
             ]
           }
@@ -682,7 +705,8 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "1_inserting_a_node_in_linkedlist",
                 "name": "Inserting a node in LinkedList",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/insert-node-at-beginning-of-linked-list/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/linked-list-insertion-1587115620/0"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/linked-list-insertion-1587115620/0",
+                "gfgSlug": "linked-list-insertion-1587115620"
               },
               {
                 "id": "2_deleting_a_node_in_linkedlist",
@@ -1072,7 +1096,9 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "3_rat_in_a_maze",
                 "name": "Rat in a Maze",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/rat-in-a-maze/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/rat-in-a-maze-problem/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/rat-in-a-maze-problem/1",
+                "leetcodeSlug": "unique-paths",
+                "gfgSlug": "rat-in-a-maze-problem"
               },
               {
                 "id": "4_word_break",
@@ -1084,7 +1110,8 @@ export const a2zDsaSheetData: Step[] = [
                 "id": "5_m_coloring_problem",
                 "name": "M Coloring Problem",
                 "leetcodeUrl": "https://takeuforward.org/data-structure/m-coloring-problem/",
-                "gfgUrl": "https://practice.geeksforgeeks.org/problems/m-coloring-problem-1587115620/1"
+                "gfgUrl": "https://practice.geeksforgeeks.org/problems/m-coloring-problem-1587115620/1",
+                "gfgSlug": "m-coloring-problem-1587115620"
               },
               {
                 "id": "6_sudoko_solver",

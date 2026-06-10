@@ -51,16 +51,29 @@ export async function POST(req: Request) {
       for (const lesson of step.lessons) {
         for (const topic of lesson.topics) {
           for (const problem of topic.problems) {
-            const leetCodeSlug = cleanSlug(problem.leetcodeUrl);
-            const gfgSlug = cleanSlug(problem.gfgUrl);
-            
-            if (platform === "leetcode" && leetCodeSlug && leetCodeSlug === targetSlug) {
-              matchedProblemId = problem.id;
-              break;
+            if (platform === "leetcode") {
+              // Check explicit slug first, then URL-extracted slug
+              if (problem.leetcodeSlug && problem.leetcodeSlug === targetSlug) {
+                matchedProblemId = problem.id;
+                break;
+              }
+              const leetCodeSlug = cleanSlug(problem.leetcodeUrl);
+              if (leetCodeSlug && leetCodeSlug === targetSlug) {
+                matchedProblemId = problem.id;
+                break;
+              }
             }
-            if (platform === "gfg" && gfgSlug && gfgSlug === targetSlug) {
-              matchedProblemId = problem.id;
-              break;
+            if (platform === "gfg") {
+              // Check explicit slug first, then URL-extracted slug
+              if (problem.gfgSlug && problem.gfgSlug.toLowerCase() === targetSlug) {
+                matchedProblemId = problem.id;
+                break;
+              }
+              const gfgSlug = cleanSlug(problem.gfgUrl);
+              if (gfgSlug && gfgSlug === targetSlug) {
+                matchedProblemId = problem.id;
+                break;
+              }
             }
           }
           if (matchedProblemId) break;
