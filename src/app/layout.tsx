@@ -26,11 +26,20 @@ export const metadata: Metadata = {
     title: "DSA Chronicles",
     description: "A platform to practice DSA problems, sync progress, and learn patterns.",
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "DSA Chronicles Logo",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "DSA Chronicles",
     description: "A platform to practice DSA problems, sync progress, and learn patterns.",
+    images: ["/twitter-image.png"],
   },
 };
 

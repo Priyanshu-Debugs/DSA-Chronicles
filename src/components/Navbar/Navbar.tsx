@@ -12,7 +12,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { name: "All", href: "/", color: "bg-white" },
+  { name: "All", href: "/dashboard", color: "bg-white" },
   { name: "Arrays", href: "/arrays", color: "bg-neoPink" },
   { name: "Binary Search", href: "/binary-search", color: "bg-neoBlue" },
   { name: "Strings", href: "/strings", color: "bg-neoYellow" },
@@ -25,7 +25,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { user, profile, logout, loading, isFirebaseAvailable } = useAuth();
 
-  if (pathname === "/login") return null;
+  if (pathname === "/" || pathname === "/login") return null;
 
   return (
     <nav className="bg-white border-b-4 border-black sticky top-0 z-40 select-none">

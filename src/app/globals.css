@@ -78,3 +78,122 @@ body {
   border-radius: 4px;
 }
 
+/* Animated grid background for landing page */
+.grid-bg-animated {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 40px;
+  }
+}
+
+/* Floating animation */
+.animate-float-slow {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+.animate-float-medium {
+  animation: floatMedium 5s ease-in-out infinite;
+}
+
+.animate-float-fast {
+  animation: floatFast 4s ease-in-out infinite;
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0) rotate(0.5deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(2deg);
+  }
+}
+
+@keyframes floatMedium {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(-2deg);
+  }
+}
+
+@keyframes floatFast {
+  0%, 100% {
+    transform: translateY(0) rotate(-0.5deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1.5deg);
+  }
+}
+
+/* Wiggle animation for hovering sticky notes */
+.hover-wiggle {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.hover-wiggle:hover {
+  animation: wiggle 0.4s ease-in-out infinite;
+  z-index: 30;
+}
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: scale(1.08) rotate(-4deg);
+  }
+  50% {
+    transform: scale(1.08) rotate(4deg);
+  }
+}
+
+/* Sticky note pin styling */
+.sticky-note-pin {
+  width: 14px;
+  height: 14px;
+  background-color: #ef4444; /* bright red pin head */
+  border: 2px solid #000000;
+  border-radius: 50%;
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 1px 1px 0px 0px rgba(0, 0, 0, 1);
+  z-index: 10;
+}
+
+.sticky-note-pin::after {
+  content: '';
+  width: 2px;
+  height: 6px;
+  background-color: #000000;
+  position: absolute;
+  bottom: -5px;
+  left: 4px;
+  transform: rotate(15deg);
+}
+
+/* Typing terminal visual effect */
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  background-color: #38BDF8;
+  animation: blink 1s step-end infinite;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+@keyframes blink {
+  from, to { background-color: transparent }
+  50% { background-color: #38BDF8 }
+}
+

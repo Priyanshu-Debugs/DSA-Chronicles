@@ -11,8 +11,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loading) {
-      const isLoggingIn = pathname === "/login";
-      if (!user && !isGuest && !isLoggingIn) {
+      const isPublicPath = pathname === "/" || pathname === "/login";
+      if (!user && !isGuest && !isPublicPath) {
         router.push("/login");
       }
     }
@@ -28,8 +28,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const isLoggingIn = pathname === "/login";
-  if (!user && !isGuest && !isLoggingIn) {
+  const isPublicPath = pathname === "/" || pathname === "/login";
+  if (!user && !isGuest && !isPublicPath) {
     return null; // Prevent flash of restricted pages before redirect
   }
 
