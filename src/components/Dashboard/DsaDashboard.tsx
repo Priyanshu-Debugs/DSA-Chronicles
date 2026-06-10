@@ -123,7 +123,8 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
       if (profile.leetcodeUsername) {
         try {
           const res = await fetch(
-            `https://alfa-leetcode-api.onrender.com/${profile.leetcodeUsername}/acSubmission?limit=100`
+            `https://alfa-leetcode-api.onrender.com/${profile.leetcodeUsername}/acSubmission?limit=100&timestamp=${Date.now()}`,
+            { cache: "no-store" }
           );
           if (res.ok) {
             const data = await res.json();
@@ -156,7 +157,8 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
       if (profile.gfgUsername) {
         try {
           const res = await fetch(
-            `https://gfg-stats.tashif.codes/${profile.gfgUsername}/solved-problems`
+            `https://gfg-stats.tashif.codes/${profile.gfgUsername}/solved-problems?timestamp=${Date.now()}`,
+            { cache: "no-store" }
           );
           if (res.ok) {
             const data = await res.json();
@@ -278,7 +280,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
       for (const baseUrl of providers) {
         try {
           // Fetch solved stats from the main user endpoint
-          const solvedRes = await fetch(`${baseUrl}/${username}`);
+          const solvedRes = await fetch(`${baseUrl}/${username}?timestamp=${Date.now()}`, { cache: "no-store" });
           if (!solvedRes.ok) continue;
           const solvedData = await solvedRes.json();
 
@@ -286,7 +288,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
           let avatarUrl: string | null = null;
           let submissionsList: any[] = [];
           try {
-            const profileRes = await fetch(`${baseUrl}/${username}/profile`);
+            const profileRes = await fetch(`${baseUrl}/${username}/profile?timestamp=${Date.now()}`, { cache: "no-store" });
             if (profileRes.ok) {
               const profileData = await profileRes.json();
               avatarUrl = profileData.profile?.userAvatar || null;
@@ -299,7 +301,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
           // If submissionsList is empty, attempt to fetch from direct submission endpoint
           if (submissionsList.length === 0) {
             try {
-              const submissionRes = await fetch(`${baseUrl}/${username}/submission?limit=30`);
+              const submissionRes = await fetch(`${baseUrl}/${username}/submission?limit=30&timestamp=${Date.now()}`, { cache: "no-store" });
               if (submissionRes.ok) {
                 const submissionData = await submissionRes.json();
                 submissionsList = submissionData.submission || submissionData.recentSubmissions || [];
@@ -354,7 +356,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
     const fetchGfgStats = async (username: string) => {
       setGfgStats({ loading: true, error: false });
       try {
-        const profileRes = await fetch(`https://gfg-stats.tashif.codes/${username}/profile`);
+        const profileRes = await fetch(`https://gfg-stats.tashif.codes/${username}/profile?timestamp=${Date.now()}`, { cache: "no-store" });
         if (!profileRes.ok) {
           throw new Error("GFG profile stats API error");
         }
@@ -363,7 +365,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
         // Fetch solved problems
         let recentSolved: Array<{ question: string; questionUrl: string; difficulty: string }> = [];
         try {
-          const solvedProblemsRes = await fetch(`https://gfg-stats.tashif.codes/${username}/solved-problems`);
+          const solvedProblemsRes = await fetch(`https://gfg-stats.tashif.codes/${username}/solved-problems?timestamp=${Date.now()}`, { cache: "no-store" });
           if (solvedProblemsRes.ok) {
             const solvedProblemsData = await solvedProblemsRes.json();
             const rawProblems = solvedProblemsData.problems || [];
