@@ -198,3 +198,15 @@ body {
   50% { background-color: #38BDF8 }
 }
 
+/* Slide in from right for Toast notifications */
+@keyframes slideIn {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+

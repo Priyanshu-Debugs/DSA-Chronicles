@@ -760,10 +760,19 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-2 text-xs font-bold text-black leading-relaxed">
+                <div className="bg-white border-2 border-black p-3.5 rounded-lg shadow-neo-sm mb-3">
+                  <span className="font-black text-xs uppercase bg-neoPurple text-white px-2 py-0.5 rounded inline-block mb-1.5">
+                    ✨ Recommended: Built-in Auto-Sync
+                  </span>
+                  <p className="text-[11px] font-bold text-gray-700 leading-normal">
+                    Real-time sync is now completely built-in! Just link your profiles, keep your DSA Tracker tab open, and whenever you solve a problem and switch back to this tab, the tracker will automatically sync your new submissions and check them off in real-time (without you refreshing the page or installing any extensions).
+                  </p>
+                </div>
+                
+                <h4 className="font-black uppercase text-sm mt-3">Alternative: Extension-based Sync (Optional)</h4>
                 <p>
-                  Submit questions on LeetCode or GeeksforGeeks and have them automatically checked off on this dashboard in real-time!
+                  If you want instant synchronization the absolute millisecond you press "Submit" on LeetCode/GFG without ever needing to click back to this tab, you can install our Userscript:
                 </p>
-                <h4 className="font-black uppercase text-sm mt-3">Instructions:</h4>
                 <ol className="list-decimal pl-4 space-y-1">
                   <li>Install a browser extension that runs userscripts, such as **Tampermonkey** or **Violentmonkey**.</li>
                   <li>Create a new userscript inside the extension.</li>

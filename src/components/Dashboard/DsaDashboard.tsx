@@ -19,6 +19,207 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
   const [notesMap, setNotesMap] = useState<Record<string, string>>({});
   const [dataLoading, setDataLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [profileSyncing, setProfileSyncing] = useState(false);
+
+  interface Toast {
+    id: string;
+    message: string;
+  }
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const lastSyncTimeRef = React.useRef<number>(0);
+
+  const showToast = (message: string) => {
+    const id = Math.random().toString(36).substring(2, 9);
+    setToasts((prev) => [...prev, { id, message }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 5000);
+  };
+
+  const syncCodingProfiles = async (force = false) => {
+    if (isGuest || !user || !db || authLoading) return;
+    if (!profile?.leetcodeUsername && !profile?.gfgUsername) return;
+
+    const now = Date.now();
+    // Throttle background calls to 15 seconds unless forced
+    if (!force && now - lastSyncTimeRef.current < 15000) {
+      return;
+    }
+    lastSyncTimeRef.current = now;
+    setProfileSyncing(true);
+
+    try {
+      // 1. Prepare solved maps and matching structures
+      const slugToIdMap: Record<string, string> = {};
+      const nameToIdMap: Record<string, string> = {};
+
+      const getLeetCodeSlug = (url?: string) => {
+        if (!url) return null;
+        const parts = url.split("/problems/");
+        return parts.length > 1 ? parts[1].split("/")[0] : null;
+      };
+
+      const cleanGfgSlug = (url?: string) => {
+        if (!url) return null;
+        const parts = url.toLowerCase().split("/problems/");
+        if (parts.length > 1) {
+          return parts[1].split("/")[0].split("?")[0].split("#")[0].trim();
+        }
+        return null;
+      };
+
+      const normalizeName = (name: string) =>
+        name.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+      a2zDsaSheetData.forEach((step) => {
+        step.lessons.forEach((l) => {
+          l.topics.forEach((t) => {
+            t.problems.forEach((p) => {
+              if (p.leetcodeSlug) {
+                slugToIdMap[p.leetcodeSlug] = p.id;
+              }
+              const lcSlug = getLeetCodeSlug(p.leetcodeUrl);
+              if (lcSlug) {
+                slugToIdMap[lcSlug] = p.id;
+              }
+              if (p.gfgSlug) {
+                slugToIdMap[p.gfgSlug.toLowerCase()] = p.id;
+              }
+              const gfgSlug = cleanGfgSlug(p.gfgUrl);
+              if (gfgSlug) {
+                slugToIdMap[gfgSlug] = p.id;
+              }
+              nameToIdMap[normalizeName(p.name)] = p.id;
+            });
+          });
+        });
+      });
+
+      // 2. Fetch the absolute latest solved map from Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      const currentSolvedMap = userDocSnap.exists()
+        ? userDocSnap.data().solvedMap || {}
+        : {};
+
+      const newSolvedMap = { ...currentSolvedMap };
+      let updated = false;
+      const today = new Date().toISOString().split("T")[0];
+      const newlySolvedNames: string[] = [];
+
+      // Helper map to find problem name by ID
+      const idToNameMap: Record<string, string> = {};
+      a2zDsaSheetData.forEach((step) => {
+        step.lessons.forEach((l) => {
+          l.topics.forEach((t) => {
+            t.problems.forEach((p) => {
+              idToNameMap[p.id] = p.name;
+            });
+          });
+        });
+      });
+
+      // 3. Fetch & Sync LeetCode
+      if (profile.leetcodeUsername) {
+        try {
+          const res = await fetch(
+            `https://alfa-leetcode-api.onrender.com/${profile.leetcodeUsername}/acSubmission?limit=100`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            const submissions = data.submission || [];
+            submissions.forEach((sub: { titleSlug: string; title?: string; timestamp: string }) => {
+              let problemId = slugToIdMap[sub.titleSlug];
+              if (!problemId && sub.title) {
+                problemId = nameToIdMap[normalizeName(sub.title)];
+              }
+              if (problemId && !newSolvedMap[problemId]?.solved) {
+                const timestampMs = parseInt(sub.timestamp) * 1000;
+                const dateStr = isNaN(timestampMs)
+                  ? today
+                  : new Date(timestampMs).toISOString().split("T")[0];
+                newSolvedMap[problemId] = {
+                  solved: true,
+                  date: dateStr,
+                };
+                newlySolvedNames.push(idToNameMap[problemId] || sub.title || "LeetCode Problem");
+                updated = true;
+              }
+            });
+          }
+        } catch (err) {
+          console.warn("Auto-sync LeetCode error:", err);
+        }
+      }
+
+      // 4. Fetch & Sync GeeksforGeeks
+      if (profile.gfgUsername) {
+        try {
+          const res = await fetch(
+            `https://gfg-stats.tashif.codes/${profile.gfgUsername}/solved-problems`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            const solvedProblemsList = data.problems || [];
+            solvedProblemsList.forEach((prob: { question?: string; questionUrl: string }) => {
+              const urlSlug = cleanGfgSlug(prob.questionUrl);
+              let problemId = urlSlug ? slugToIdMap[urlSlug] : undefined;
+              if (!problemId && prob.question) {
+                problemId = nameToIdMap[normalizeName(prob.question)];
+              }
+              if (problemId && !newSolvedMap[problemId]?.solved) {
+                newSolvedMap[problemId] = {
+                  solved: true,
+                  date: today,
+                };
+                newlySolvedNames.push(idToNameMap[problemId] || prob.question || "GFG Problem");
+                updated = true;
+              }
+            });
+          }
+        } catch (err) {
+          console.warn("Auto-sync GFG error:", err);
+        }
+      }
+
+      // 5. Update Firestore if anything matched
+      if (updated) {
+        await setDoc(userDocRef, { solvedMap: newSolvedMap }, { merge: true });
+        setSolvedMap(newSolvedMap);
+        newlySolvedNames.forEach((name) => {
+          showToast(`🎉 Auto-Solved: ${name} is marked as complete!`);
+        });
+      } else if (force) {
+        showToast("🔄 Sync completed! No new submissions found.");
+      }
+    } catch (err) {
+      console.error("Auto-sync profiles error:", err);
+      if (force) {
+        showToast("❌ Sync failed. Please check your network connection.");
+      }
+    } finally {
+      setProfileSyncing(false);
+    }
+  };
+
+  // Trigger auto-sync on load and when the window gains focus
+  useEffect(() => {
+    if (authLoading || isGuest || !user || !profile) return;
+
+    const initialSyncTimer = setTimeout(() => {
+      syncCodingProfiles();
+    }, 2000);
+
+    const handleFocus = () => {
+      syncCodingProfiles();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      clearTimeout(initialSyncTimer);
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [profile, user, authLoading, isGuest]);
 
   const filterList = stepIdFilter
     ? Array.isArray(stepIdFilter)
@@ -428,6 +629,10 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
               <div className="bg-neoBlue text-black px-2.5 py-0.5 border-2 border-black font-black text-[10px] uppercase w-max mb-3 rounded">
                 LOADING DATA...
               </div>
+            ) : profileSyncing ? (
+              <div className="bg-neoPurple text-white px-2.5 py-0.5 border-2 border-black font-black text-[10px] uppercase w-max mb-3 rounded animate-pulse shadow-neo-sm">
+                SYNCING PROFILES...
+              </div>
             ) : syncing ? (
               <div className="bg-neoYellow text-black px-2.5 py-0.5 border-2 border-black font-black text-[10px] uppercase w-max mb-3 rounded animate-pulse">
                 SYNCING CLOUD...
@@ -507,7 +712,43 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
 
       {/* Coding Profiles Dashboard Integration */}
       {!authLoading && (profile?.leetcodeUsername || profile?.gfgUsername) && (
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center bg-white border-4 border-black p-4 shadow-neo rounded-xl gap-4">
+            <div>
+              <h3 className="font-black text-xl uppercase flex items-center gap-2">
+                ⚡ Linked Profiles
+                {profileSyncing && (
+                  <span className="inline-flex h-2 w-2 rounded-full bg-neoPurple border border-black animate-ping" />
+                )}
+              </h3>
+              <p className="text-xs font-bold text-gray-500 uppercase mt-0.5">
+                Automatically checks off solved problems in real-time
+              </p>
+            </div>
+            <button
+              onClick={() => syncCodingProfiles(true)}
+              disabled={profileSyncing}
+              className="bg-neoYellow border-4 border-black font-black text-sm py-2.5 px-5 rounded-lg shadow-neo hover:bg-yellow-300 disabled:opacity-50 transition-all uppercase flex items-center justify-center gap-2 cursor-pointer hover:-translate-y-0.5 active:translate-y-0.5 neo-clickable w-max"
+            >
+              {profileSyncing ? (
+                <>
+                  <svg className="animate-spin h-4 w-4 text-black" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Syncing Profiles...
+                </>
+              ) : (
+                <>
+                  <svg className="h-4 w-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                  Sync Profiles
+                </>
+              )}
+            </button>
+          </div>
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* LeetCode Profile Card */}
           {profile?.leetcodeUsername && (
             <div className="bg-[#1a1a1a] text-white border-4 border-black p-6 shadow-neo rounded-xl space-y-4">
@@ -738,6 +979,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
             </div>
           )}
         </section>
+        </div>
       )}
 
       {/* Prompt to connect coding profiles if none connected */}
@@ -938,6 +1180,26 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
           </div>
         </div>
       )}
+      {/* Toast Notification Overlays */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm w-full">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className="bg-[#FFFDEB] border-4 border-black p-4 shadow-neo rounded-xl flex items-center justify-between gap-3 animate-[slideIn_0.3s_ease-out]"
+            style={{
+              boxShadow: "4px 4px 0px 0px rgba(0, 0, 0, 1)",
+            }}
+          >
+            <span className="font-black text-sm text-black">{toast.message}</span>
+            <button
+              onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
+              className="text-gray-500 hover:text-black font-black text-xs shrink-0 cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
