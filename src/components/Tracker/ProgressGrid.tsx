@@ -6,24 +6,36 @@ interface ProgressGridProps {
   solvedMap: Record<string, { solved: boolean; date?: string }>;
 }
 
-export default function ProgressGrid({ solvedMap }: ProgressGridProps) {
-  // Generate tracking days: exactly 53 weeks (371 days) aligned to Sunday (full year)
-  const columns = 53;
-  const totalDays = columns * 7;
+// Helper to format YYYY-MM-DD to DD-MM-YYYY
+const formatToDdMmYyyy = (dateStr: string) => {
+  const parts = dateStr.split("-");
+  if (parts.length === 3) {
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  return dateStr;
+};
 
-  // Find the current UTC date to avoid timezone offset discrepancies
-  const now = new Date();
-  const utcToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  
-  // Get UTC day of week: 0 (Sun) to 6 (Sat)
-  const currentUTCDayOfWeek = utcToday.getUTCDay();
-  const daysUntilSaturday = 6 - currentUTCDayOfWeek;
-  
-  const utcEndDate = new Date(utcToday);
-  utcEndDate.setUTCDate(utcToday.getUTCDate() + daysUntilSaturday);
-  
-  const utcStartDate = new Date(utcEndDate);
-  utcStartDate.setUTCDate(utcEndDate.getUTCDate() - totalDays + 1);
+export default function ProgressGrid({ solvedMap }: ProgressGridProps) {
+  // Use the current year to show a full-year calendar starting from January
+  const currentYear = new Date().getFullYear();
+
+  // Start date: The Sunday on or before Jan 1st of the current year
+  const jan1 = new Date(Date.UTC(currentYear, 0, 1));
+  const startDayOfWeek = jan1.getUTCDay(); // 0 is Sunday, 1 is Monday, etc.
+  const utcStartDate = new Date(jan1);
+  utcStartDate.setUTCDate(jan1.getUTCDate() - startDayOfWeek);
+
+  // End date: The Saturday on or after Dec 31st of the current year
+  const dec31 = new Date(Date.UTC(currentYear, 11, 31));
+  const endDayOfWeek = dec31.getUTCDay();
+  const daysUntilSaturday = 6 - endDayOfWeek;
+  const utcEndDate = new Date(dec31);
+  utcEndDate.setUTCDate(dec31.getUTCDate() + daysUntilSaturday);
+
+  // Calculate the total number of days to display
+  const msDiff = utcEndDate.getTime() - utcStartDate.getTime();
+  const totalDays = Math.round(msDiff / (1000 * 60 * 60 * 24)) + 1;
+  const columns = Math.ceil(totalDays / 7);
 
   const daysArray = Array.from({ length: totalDays }).map((_, idx) => {
     const d = new Date(utcStartDate);
@@ -45,16 +57,16 @@ export default function ProgressGrid({ solvedMap }: ProgressGridProps) {
     weeks.push(daysArray.slice(i, i + 7));
   }
 
-  // Get month label for each column header
+  // Get month label for each column header using UTC to avoid timezone issues
   const getMonthLabel = (weekDays: string[], index: number) => {
-    const date = new Date(weekDays[0]);
+    const date = new Date(weekDays[0] + "T00:00:00Z");
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const month = monthNames[date.getMonth()];
+    const month = monthNames[date.getUTCMonth()];
 
     // Show label if first column or if month changes from the previous week
     if (index === 0) return month;
-    const prevDate = new Date(weeks[index - 1][0]);
-    if (date.getMonth() !== prevDate.getMonth()) {
+    const prevDate = new Date(weeks[index - 1][0] + "T00:00:00Z");
+    if (date.getUTCMonth() !== prevDate.getUTCMonth()) {
       return month;
     }
     return "";
@@ -70,6 +82,16 @@ export default function ProgressGrid({ solvedMap }: ProgressGridProps) {
 
   return (
     <div className="bg-white border-4 border-black p-4 rounded-xl shadow-neo w-full select-none">
+      {/* Calendar Header with Year */}
+      <div className="flex justify-between items-center mb-3">
+        <span className="text-xs font-black uppercase text-gray-500">
+          Activity Calendar
+        </span>
+        <span className="bg-black text-white text-xs font-black px-2 py-0.5 rounded shadow-neo-sm">
+          {currentYear}
+        </span>
+      </div>
+
       <div className="overflow-x-auto scrollbar-none w-full">
         <div className="min-w-max pb-1 flex flex-col">
           {/* Top Row: Spacer + Month Labels */}
@@ -111,14 +133,14 @@ export default function ProgressGrid({ solvedMap }: ProgressGridProps) {
                 return (
                   <div
                     key={dateStr}
-                    className={`w-3 h-3 rounded-[2px] cursor-pointer relative group transition-all hover:scale-125 ${getColorClass(
+                    className={`w-3 h-3 rounded-[2px] cursor-pointer relative group transition-all hover:scale-125 hover:z-50 ${getColorClass(
                       count
                     )}`}
                   >
                     {/* Custom pop-up tooltips */}
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-30 pointer-events-none">
                       <div className="bg-black text-white text-[9px] font-extrabold px-2 py-0.5 rounded border border-white whitespace-nowrap shadow-neo-sm">
-                        {dateStr}: {count} solved
+                        {formatToDdMmYyyy(dateStr)}: {count} solved
                       </div>
                     </div>
                   </div>
@@ -142,4 +164,3 @@ export default function ProgressGrid({ solvedMap }: ProgressGridProps) {
     </div>
   );
 }
-
