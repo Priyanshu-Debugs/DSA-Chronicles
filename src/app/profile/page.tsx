@@ -51,10 +51,17 @@ export default function ProfilePage() {
     if (!username) return;
     setLoadingGfgStats(true);
     try {
-      const res = await fetch(`https://gfg-stats.tashif.codes/${username}/profile`);
+      const res = await fetch(`/api/gfg?username=${username}`);
       if (res.ok) {
         const data = await res.json();
-        setGfgStats(data);
+        setGfgStats({
+          fullName: data.mentorName || username,
+          profilePicture: data.profilePicture || "https://media.geeksforgeeks.org/gfg-gg-logo.svg",
+          institute: data.institute || "N/A",
+          instituteRank: data.instituteRank || "N/A",
+          codingScore: data.codingScore || 0,
+          totalProblemsSolved: data.totalProblemsSolved || 0,
+        });
       } else {
         setGfgStats(null);
       }
@@ -165,10 +172,10 @@ export default function ProfilePage() {
       });
 
       const response = await fetch(
-        `https://alfa-leetcode-api.onrender.com/${leetcodeUser}/acSubmission?limit=100`
+        `/api/leetcode?username=${leetcodeUser}`
       );
       if (!response.ok) {
-        throw new Error("Failed to contact LeetCode proxy API");
+        throw new Error("Failed to contact LeetCode API");
       }
 
       const data = await response.json();
@@ -294,7 +301,7 @@ export default function ProfilePage() {
         });
       });
 
-      const response = await fetch(`https://gfg-stats.tashif.codes/${gfgUser}/solved-problems`);
+      const response = await fetch(`/api/gfg?username=${gfgUser}`);
       if (!response.ok) {
         throw new Error("Failed to contact GFG solved problems API");
       }
@@ -592,7 +599,7 @@ export default function ProfilePage() {
               <span className="truncate block font-extrabold">
                 {gfgUser ? (
                   <a
-                    href={`https://www.geeksforgeeks.org/user/${gfgUser}`}
+                    href={`https://www.geeksforgeeks.org/profile/${gfgUser}`}
                     target="_blank"
                     className="underline hover:text-neoGreen"
                   >

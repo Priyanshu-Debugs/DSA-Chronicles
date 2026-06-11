@@ -125,7 +125,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
       if (profile.leetcodeUsername) {
         try {
           const res = await fetch(
-            `https://alfa-leetcode-api.onrender.com/${profile.leetcodeUsername}/acSubmission?limit=100&timestamp=${Date.now()}`,
+            `/api/leetcode?username=${profile.leetcodeUsername}`,
             { cache: "no-store" }
           );
           if (res.ok) {
@@ -159,7 +159,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
       if (profile.gfgUsername) {
         try {
           const res = await fetch(
-            `https://gfg-stats.tashif.codes/${profile.gfgUsername}/solved-problems?timestamp=${Date.now()}`,
+            `/api/gfg?username=${profile.gfgUsername}`,
             { cache: "no-store" }
           );
           if (res.ok) {
@@ -273,132 +273,61 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
     // LeetCode Stats Fetching
     const fetchLeetCodeStats = async (username: string) => {
       setLcStats({ loading: true, error: false });
-      
-      const providers = [
-        "https://leetcode-stats.tashif.codes",
-        "https://alfa-leetcode-api.vercel.app"
-      ];
-
-      for (const baseUrl of providers) {
-        try {
-          // Fetch solved stats from the main user endpoint
-          const solvedRes = await fetch(`${baseUrl}/${username}?timestamp=${Date.now()}`, { cache: "no-store" });
-          if (!solvedRes.ok) continue;
-          const solvedData = await solvedRes.json();
-
-          // Fetch basic profile for avatar
-          let avatarUrl: string | null = null;
-          let submissionsList: any[] = [];
-          try {
-            const profileRes = await fetch(`${baseUrl}/${username}/profile?timestamp=${Date.now()}`, { cache: "no-store" });
-            if (profileRes.ok) {
-              const profileData = await profileRes.json();
-              avatarUrl = profileData.profile?.userAvatar || null;
-              submissionsList = profileData.recentSubmissions || [];
-            }
-          } catch (profileErr) {
-            // Silence profile specific errors to allow submissions fallback
-          }
-
-          // If submissionsList is empty, attempt to fetch from direct submission endpoint
-          if (submissionsList.length === 0) {
-            try {
-              const submissionRes = await fetch(`${baseUrl}/${username}/submission?limit=30&timestamp=${Date.now()}`, { cache: "no-store" });
-              if (submissionRes.ok) {
-                const submissionData = await submissionRes.json();
-                submissionsList = submissionData.submission || submissionData.recentSubmissions || [];
-              }
-            } catch (subErr) {
-              // Silence submission specific errors
-            }
-          }
-
-          // Extract last 5-10 solved questions (Accepted status, unique problems)
-          const acceptedSubmissions = submissionsList.filter(
-            (sub: any) => sub.statusDisplay === "Accepted"
-          );
-
-          const uniqueSolved: Array<{ title: string; titleSlug: string; timestamp: string; lang: string }> = [];
-          const seenTitles = new Set<string>();
-          for (const sub of acceptedSubmissions) {
-            if (!seenTitles.has(sub.title)) {
-              seenTitles.add(sub.title);
-              uniqueSolved.push({
-                title: sub.title,
-                titleSlug: sub.titleSlug,
-                timestamp: sub.timestamp,
-                lang: sub.lang,
-              });
-            }
-          }
-          const recentSolved = uniqueSolved.slice(0, 10);
-
-          setLcStats({
-            ranking: solvedData.ranking || 0,
-            totalSolved: solvedData.totalSolved || 0,
-            easySolved: solvedData.easySolved || 0,
-            mediumSolved: solvedData.mediumSolved || 0,
-            hardSolved: solvedData.hardSolved || 0,
-            avatar: avatarUrl,
-            recentSolved,
-            loading: false,
-            error: false,
-          });
-          return; // Successfully fetched from this provider!
-        } catch (err) {
-          console.warn(`Failed to fetch LeetCode stats from ${baseUrl}:`, err);
+      try {
+        const res = await fetch(`/api/leetcode?username=${username}`, { cache: "no-store" });
+        if (!res.ok) {
+          throw new Error("Local LeetCode API stats error");
         }
-      }
+        const data = await res.json();
 
-      // If all providers fail
-      setLcStats({ loading: false, error: true });
+        const submissions = data.submission || [];
+        const recentSolved = submissions.map((sub: any) => ({
+          title: sub.title,
+          titleSlug: sub.titleSlug,
+          timestamp: sub.timestamp,
+          lang: sub.lang || "unknown",
+        })).slice(0, 10);
+
+        setLcStats({
+          ranking: data.ranking || 0,
+          totalSolved: data.totalSolved || 0,
+          easySolved: data.easySolved || 0,
+          mediumSolved: data.mediumSolved || 0,
+          hardSolved: data.hardSolved || 0,
+          avatar: data.avatarUrl || null,
+          recentSolved,
+          loading: false,
+          error: false,
+        });
+      } catch (err) {
+        console.warn("Failed to fetch LeetCode stats from local API:", err);
+        setLcStats({ loading: false, error: true });
+      }
     };
 
     // GeeksforGeeks Stats Fetching
     const fetchGfgStats = async (username: string) => {
       setGfgStats({ loading: true, error: false });
       try {
-        const profileRes = await fetch(`https://gfg-stats.tashif.codes/${username}/profile?timestamp=${Date.now()}`, { cache: "no-store" });
-        if (!profileRes.ok) {
-          throw new Error("GFG profile stats API error");
+        const res = await fetch(`/api/gfg?username=${username}`, { cache: "no-store" });
+        if (!res.ok) {
+          throw new Error("Local GFG API stats error");
         }
-        const profileData = await profileRes.json();
-
-        // Fetch solved problems
-        let recentSolved: Array<{ question: string; questionUrl: string; difficulty: string }> = [];
-        try {
-          const solvedProblemsRes = await fetch(`https://gfg-stats.tashif.codes/${username}/solved-problems?timestamp=${Date.now()}`, { cache: "no-store" });
-          if (solvedProblemsRes.ok) {
-            const solvedProblemsData = await solvedProblemsRes.json();
-            const rawProblems = solvedProblemsData.problems || [];
-            
-            // Remove duplicates if any
-            const uniqueProblems: any[] = [];
-            const seenQuestions = new Set<string>();
-            for (const p of rawProblems) {
-              if (p.question && !seenQuestions.has(p.question)) {
-                seenQuestions.add(p.question);
-                uniqueProblems.push({
-                  question: p.question,
-                  questionUrl: p.questionUrl,
-                  difficulty: p.difficulty || "medium",
-                });
-              }
-            }
-            recentSolved = uniqueProblems.slice(0, 10);
-          }
-        } catch (solvedErr) {
-          console.error("Failed to fetch GFG solved problems:", solvedErr);
-        }
+        const data = await res.json();
 
         setGfgStats({
-          ...profileData,
-          recentSolved,
+          fullName: data.mentorName || username,
+          profilePicture: data.profilePicture || "https://media.geeksforgeeks.org/gfg-gg-logo.svg",
+          institute: data.institute || "N/A",
+          instituteRank: data.instituteRank || "N/A",
+          codingScore: data.codingScore || 0,
+          totalProblemsSolved: data.totalProblemsSolved || 0,
+          recentSolved: data.recentSolved || [],
           loading: false,
           error: false,
         });
       } catch (err) {
-        console.error("Failed to fetch GFG stats:", err);
+        console.error("Failed to fetch GFG stats from local API:", err);
         setGfgStats({ loading: false, error: true });
       }
     };
@@ -920,7 +849,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
                   <div>
                     <h3 className="text-xl font-black tracking-tight text-[#2f8d46] uppercase">GFG Profile</h3>
                     <a
-                      href={`https://www.geeksforgeeks.org/user/${profile?.gfgUsername}`}
+                      href={`https://www.geeksforgeeks.org/profile/${profile?.gfgUsername}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs font-bold text-[#0f5132]/75 hover:text-[#0f5132] underline"
