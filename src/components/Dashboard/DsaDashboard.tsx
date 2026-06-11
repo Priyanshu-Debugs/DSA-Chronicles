@@ -7,6 +7,7 @@ import ProgressGrid from "@/components/Tracker/ProgressGrid";
 import NotebookEditor from "@/components/Notebook/NotebookEditor";
 import { useAuth } from "@/context/AuthContext";
 import { db, doc, getDoc, setDoc, onSnapshot } from "@/lib/firebase";
+import PracticeArena from "@/components/Dashboard/PracticeArena";
 
 interface DsaDashboardProps {
   stepIdFilter?: string | string[];
@@ -20,6 +21,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
   const [dataLoading, setDataLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [profileSyncing, setProfileSyncing] = useState(false);
+  const [activeTab, setActiveTab] = useState<"sheet" | "practice">("sheet");
 
   interface Toast {
     id: string;
@@ -675,19 +677,39 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
           </p>
         </div>
 
-        {/* Navigation Button */}
-        <div>
+        {/* Navigation Tab Switcher */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+          <div className="flex border-4 border-black rounded-lg overflow-hidden shadow-neo shrink-0 bg-white">
+            <button
+              onClick={() => setActiveTab("sheet")}
+              className={`px-4 py-2.5 font-black text-sm uppercase cursor-pointer transition-all ${
+                activeTab === "sheet" ? "bg-neoBlue text-black" : "bg-white text-black hover:bg-gray-100"
+              }`}
+            >
+              Roadmap
+            </button>
+            <button
+              onClick={() => setActiveTab("practice")}
+              className={`px-4 py-2.5 border-l-4 border-black font-black text-sm uppercase cursor-pointer transition-all ${
+                activeTab === "practice" ? "bg-neoPurple text-white" : "bg-white text-black hover:bg-gray-100"
+              }`}
+            >
+              Practice Arena
+            </button>
+          </div>
           <Link
             href="/patterns"
-            className="inline-block bg-neoPurple border-4 border-black font-black text-sm md:text-base py-3 px-6 rounded-lg shadow-neo neo-clickable uppercase hover:-translate-y-0.5"
+            className="inline-block text-center bg-neoYellow border-4 border-black text-black font-black text-sm py-2.5 px-5 rounded-lg shadow-neo neo-clickable uppercase hover:-translate-y-0.5"
           >
-            Pattern Cheat Sheet
+            Cheat Sheet
           </Link>
         </div>
       </header>
 
-      {/* Progress Dashboard Banner */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {activeTab === "sheet" ? (
+        <>
+          {/* Progress Dashboard Banner */}
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Statistics Box */}
         <div className="bg-neoGreen border-4 border-black p-6 shadow-neo rounded-xl flex flex-col justify-between">
           <div>
@@ -1149,6 +1171,10 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
           );
         })}
       </section>
+        </>
+      ) : (
+        <PracticeArena />
+      )}
 
       {/* Neubrutalist Notes Overlay Modal */}
       {editingProblem && (
