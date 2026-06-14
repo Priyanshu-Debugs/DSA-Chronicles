@@ -147,6 +147,12 @@ export default function Home() {
           >
             Cheat Sheets
           </Link>
+          <Link
+            href="/aptitude"
+            className="bg-neoPurple border-4 border-black text-black font-black uppercase py-4 px-8 text-xl rounded-xl shadow-neo hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all neo-clickable inline-block"
+          >
+            Aptitude
+          </Link>
         </div>
 
         {/* Interactive Terminal Simulator & Features Grid */}

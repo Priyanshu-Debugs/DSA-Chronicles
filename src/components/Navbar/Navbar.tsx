@@ -25,7 +25,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { user, profile, logout, loading, isFirebaseAvailable } = useAuth();
 
-  if (pathname === "/" || pathname === "/login") return null;
+  if (pathname === "/" || pathname === "/login" || pathname.startsWith("/aptitude")) return null;
 
   return (
     <nav className="bg-white border-b-4 border-black sticky top-0 z-40 select-none">
