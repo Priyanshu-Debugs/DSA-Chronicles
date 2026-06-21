@@ -10,7 +10,7 @@ export interface LanguageCode {
 
 export interface ProblemVisualizerMeta {
   problemName: string;
-  category: "arrays" | "binary-search" | "strings" | "linked-list" | "recursion";
+  category: "arrays" | "binary-search" | "strings" | "linked-list" | "recursion" | "two-pointers";
   description: string;
   visualizerType: "array1d" | "matrix2d" | "linkedlist" | "stringmap" | "recursion";
   solutions: {
@@ -30,7 +30,7 @@ export function getProblemMeta(problemId: string, problemName: string): ProblemV
 
   // Determine Visual Archetype
   let visualizerType: "array1d" | "matrix2d" | "linkedlist" | "stringmap" | "recursion" = "array1d";
-  let category: "arrays" | "binary-search" | "strings" | "linked-list" | "recursion" = "arrays";
+  let category: "arrays" | "binary-search" | "strings" | "linked-list" | "recursion" | "two-pointers" = "arrays";
   const normalizedId = problemId.toLowerCase();
   const normalizedName = problemName.toLowerCase();
 

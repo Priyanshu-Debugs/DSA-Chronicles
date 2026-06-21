@@ -471,16 +471,23 @@ export default function Chatbot() {
     });
   };
 
-  if (!user || isGuest || pathname !== "/dashboard") {
+  // Hide chatbot entirely on public pages (landing & login)
+  const isPublicPage = pathname === "/" || pathname === "/login";
+  if (isPublicPage) {
     return null;
   }
+
+  // Determine if user needs to log in to use the chatbot
+  const requiresLogin = !user || isGuest;
 
   return (
     <>
       {/* Floating help hint bubble */}
       {!isOpen && (
         <div className="fixed bottom-[88px] right-6 bg-neoPink border-2 border-black px-3 py-1.5 text-[10px] font-black uppercase shadow-neo-sm z-50 rounded-none max-w-[200px] text-center select-none text-black animate-bounce">
-          AI Chat-Bot Available for Help, If you are Stuck!
+          {requiresLogin
+            ? "AI DSA Helper — Login to get started!"
+            : "AI DSA Helper — Ask anything about this problem!"}
           {/* Small arrow pointing down */}
           <div className="absolute top-full right-5 w-3 h-3 bg-neoPink border-r-2 border-b-2 border-black transform rotate-45 -translate-y-1.5" />
         </div>
@@ -545,96 +552,130 @@ export default function Chatbot() {
             </div>
           </div>
 
-          {/* Conversation History Stream */}
-          <div className="flex-1 p-4 overflow-y-auto bg-[#FAF9F5] flex flex-col gap-4.5 scrollbar-custom">
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`flex flex-col max-w-[85%] ${
-                  msg.role === "user" ? "self-end items-end" : "self-start items-start"
-                }`}
-              >
-                <div
-                  className={`border-2 border-black p-3 text-xs shadow-neo-sm text-black rounded-none ${
-                    msg.role === "user"
-                      ? "bg-neoBlue font-bold"
-                      : "bg-white font-medium"
-                  }`}
+          {/* Guest / Unauthenticated Login Gate */}
+          {requiresLogin ? (
+            <div className="flex-1 flex flex-col items-center justify-center bg-[#FAF9F5] p-8 gap-6">
+              <div className="bg-neoYellow border-4 border-black p-6 shadow-neo rounded-none text-center max-w-xs">
+                <GeminiLogo className="w-16 h-16 mx-auto mb-4" />
+                <h3 className="font-black text-xl uppercase mb-2 text-black">Login Required</h3>
+                <p className="font-bold text-sm text-gray-700 mb-5 leading-relaxed">
+                  Sign in to unlock the AI-powered DSA Helper. Get instant explanations, code solutions, and step-by-step guidance!
+                </p>
+                <a
+                  href="/login"
+                  className="inline-block w-full py-3 bg-neoGreen border-4 border-black font-black text-sm uppercase shadow-neo hover:-translate-y-0.5 active:translate-y-0.5 neo-clickable cursor-pointer text-center text-black rounded-none"
                 >
-                  {msg.role === "user" ? (
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
-                  ) : (
-                    <div className="flex flex-col gap-1">{formatMessageContent(msg.content)}</div>
-                  )}
+                  🔐 Login to Use
+                </a>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-[10px] font-black uppercase text-gray-400">Features include</span>
+                <div className="flex flex-wrap gap-1.5 justify-center max-w-xs">
+                  {["DSA Explanations", "Code Solutions", "Complexity Analysis", "Problem Hints"].map((feat) => (
+                    <span
+                      key={feat}
+                      className="bg-white border-2 border-black px-2 py-1 text-[9px] font-black uppercase text-gray-600 shadow-neo-sm"
+                    >
+                      {feat}
+                    </span>
+                  ))}
                 </div>
-                <span className="text-[9px] font-black uppercase text-gray-500 mt-1 px-1">
-                  {msg.role === "user" ? "You" : "DSA Helper"}
-                </span>
               </div>
-            ))}
-
-            {/* Thinking Loading Indicator */}
-            {isLoading && (
-              <div className="self-start flex flex-col max-w-[85%] items-start">
-                <div className="bg-white border-2 border-black p-3 text-xs shadow-neo-sm text-black rounded-none flex items-center gap-1 font-bold">
-                  <GeminiLogo className="w-4 h-4 animate-spin" />
-                  <span>Helper is typing</span>
-                  <span className="animate-bounce">.</span>
-                  <span className="animate-bounce [animation-delay:0.2s]">.</span>
-                  <span className="animate-bounce [animation-delay:0.4s]">.</span>
-                </div>
-                <span className="text-[9px] font-black uppercase text-gray-500 mt-1 px-1">
-                  DSA Helper
-                </span>
-              </div>
-            )}
-
-            {/* Error Message banner */}
-            {error && (
-              <div className="bg-neoRed/10 border-2 border-neoRed p-3 text-xs font-bold text-neoRed">
-                ⚠️ Error: {error}
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Quick suggestions block (Shown when no pending query is processing) */}
-          {!isLoading && (
-            <div className="px-3 py-2 bg-neutral-100 border-t-2 border-black overflow-x-auto flex gap-2 scrollbar-none">
-              {QUICK_PROMPTS.map((prompt, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleSuggestionClick(prompt)}
-                  className="bg-white border-2 border-black hover:bg-neoYellow text-[10px] font-black uppercase px-2.5 py-1.5 cursor-pointer shadow-neo-sm flex-shrink-0 transition-all hover:-translate-y-0.5 active:translate-y-0.5 rounded-none"
-                >
-                  {prompt}
-                </button>
-              ))}
             </div>
-          )}
+          ) : (
+            <>
+              {/* Conversation History Stream */}
+              <div className="flex-1 p-4 overflow-y-auto bg-[#FAF9F5] flex flex-col gap-4.5 scrollbar-custom">
+                {messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`flex flex-col max-w-[85%] ${
+                      msg.role === "user" ? "self-end items-end" : "self-start items-start"
+                    }`}
+                  >
+                    <div
+                      className={`border-2 border-black p-3 text-xs shadow-neo-sm text-black rounded-none ${
+                        msg.role === "user"
+                          ? "bg-neoBlue font-bold"
+                          : "bg-white font-medium"
+                      }`}
+                    >
+                      {msg.role === "user" ? (
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
+                      ) : (
+                        <div className="flex flex-col gap-1">{formatMessageContent(msg.content)}</div>
+                      )}
+                    </div>
+                    <span className="text-[9px] font-black uppercase text-gray-500 mt-1 px-1">
+                      {msg.role === "user" ? "You" : "DSA Helper"}
+                    </span>
+                  </div>
+                ))}
 
-          {/* User Input Form */}
-          <form
-            onSubmit={handleFormSubmit}
-            className="p-3 bg-white border-t-4 border-black flex gap-2 items-center"
-          >
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ask a DSA question..."
-              disabled={isLoading}
-              className="flex-1 border-2 border-black p-2 font-bold text-xs bg-neoCream focus:outline-none focus:bg-white placeholder-gray-500 rounded-none"
-            />
-            <button
-              type="submit"
-              disabled={isLoading || !inputValue.trim()}
-              className="px-4.5 py-2 bg-neoGreen border-2 border-black font-black uppercase text-xs shadow-neo-sm hover:-translate-y-0.5 active:translate-y-0.5 neo-clickable disabled:opacity-50 disabled:pointer-events-none cursor-pointer flex items-center justify-center rounded-none"
-            >
-              Send
-            </button>
-          </form>
+                {/* Thinking Loading Indicator */}
+                {isLoading && (
+                  <div className="self-start flex flex-col max-w-[85%] items-start">
+                    <div className="bg-white border-2 border-black p-3 text-xs shadow-neo-sm text-black rounded-none flex items-center gap-1 font-bold">
+                      <GeminiLogo className="w-4 h-4 animate-spin" />
+                      <span>Helper is typing</span>
+                      <span className="animate-bounce">.</span>
+                      <span className="animate-bounce [animation-delay:0.2s]">.</span>
+                      <span className="animate-bounce [animation-delay:0.4s]">.</span>
+                    </div>
+                    <span className="text-[9px] font-black uppercase text-gray-500 mt-1 px-1">
+                      DSA Helper
+                    </span>
+                  </div>
+                )}
+
+                {/* Error Message banner */}
+                {error && (
+                  <div className="bg-neoRed/10 border-2 border-neoRed p-3 text-xs font-bold text-neoRed">
+                    ⚠️ Error: {error}
+                  </div>
+                )}
+
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Quick suggestions block (Shown when no pending query is processing) */}
+              {!isLoading && (
+                <div className="px-3 py-2 bg-neutral-100 border-t-2 border-black overflow-x-auto flex gap-2 scrollbar-none">
+                  {QUICK_PROMPTS.map((prompt, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSuggestionClick(prompt)}
+                      className="bg-white border-2 border-black hover:bg-neoYellow text-[10px] font-black uppercase px-2.5 py-1.5 cursor-pointer shadow-neo-sm flex-shrink-0 transition-all hover:-translate-y-0.5 active:translate-y-0.5 rounded-none"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* User Input Form */}
+              <form
+                onSubmit={handleFormSubmit}
+                className="p-3 bg-white border-t-4 border-black flex gap-2 items-center"
+              >
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="Ask a DSA question..."
+                  disabled={isLoading}
+                  className="flex-1 border-2 border-black p-2 font-bold text-xs bg-neoCream focus:outline-none focus:bg-white placeholder-gray-500 rounded-none"
+                />
+                <button
+                  type="submit"
+                  disabled={isLoading || !inputValue.trim()}
+                  className="px-4.5 py-2 bg-neoGreen border-2 border-black font-black uppercase text-xs shadow-neo-sm hover:-translate-y-0.5 active:translate-y-0.5 neo-clickable disabled:opacity-50 disabled:pointer-events-none cursor-pointer flex items-center justify-center rounded-none"
+                >
+                  Send
+                </button>
+              </form>
+            </>
+          )}
         </div>
       )}
     </>
