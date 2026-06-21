@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import { AuthContextProvider } from "@/context/AuthContext";
 import AuthGuard from "@/components/Auth/AuthGuard";
+import Chatbot from "@/components/Chat/Chatbot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -58,6 +59,7 @@ export default function RootLayout({
           <AuthGuard>
             <Navbar />
             <div className="flex-1 w-full">{children}</div>
+            <Chatbot />
           </AuthGuard>
         </AuthContextProvider>
       </body>
