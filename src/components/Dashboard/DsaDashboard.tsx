@@ -8,6 +8,8 @@ import NotebookEditor from "@/components/Notebook/NotebookEditor";
 import { useAuth } from "@/context/AuthContext";
 import { db, doc, getDoc, setDoc, onSnapshot } from "@/lib/firebase";
 import PracticeArena from "@/components/Dashboard/PracticeArena";
+import { getProblemMeta } from "@/components/Visualizer/visualizerRegistry";
+import VisualizerModal from "@/components/Visualizer/VisualizerModal";
 
 interface DsaDashboardProps {
   stepIdFilter?: string | string[];
@@ -239,6 +241,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
     filteredSteps.length > 0 ? filteredSteps[0].stepId : null
   );
   const [editingProblem, setEditingProblem] = useState<Problem | null>(null);
+  const [visualizingProblem, setVisualizingProblem] = useState<Problem | null>(null);
 
   // LeetCode states
   const [lcStats, setLcStats] = useState<{
@@ -998,6 +1001,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
                                 <tr className="border-b-2 border-black text-xs font-black uppercase tracking-wider text-gray-500">
                                   <th className="py-2 px-3 w-16">Done</th>
                                   <th className="py-2 px-3">Problem Name</th>
+                                  <th className="py-2 px-3 w-24 text-center">Visual</th>
                                   <th className="py-2 px-3 w-40 text-center">Practice</th>
                                   <th className="py-2 px-3 w-20 text-center">Note</th>
                                 </tr>
@@ -1036,6 +1040,16 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
                                         >
                                           {problem.name}
                                         </span>
+                                      </td>
+
+                                      {/* Visualizer play button */}
+                                      <td className="py-3 px-3 text-center">
+                                        <button
+                                          onClick={() => setVisualizingProblem(problem)}
+                                          className="px-3 py-1 bg-neoYellow border-2 border-black font-extrabold text-xs shadow-neo-sm hover:-translate-y-0.5 active:translate-y-0.5 neo-clickable cursor-pointer inline-block"
+                                        >
+                                          🎬 Play
+                                        </button>
                                       </td>
 
                                       {/* External Practice Portals */}
@@ -1137,6 +1151,15 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
           </div>
         </div>
       )}
+
+      {/* Visualizer Modal Overlay */}
+      {visualizingProblem && (
+        <VisualizerModal
+          problem={visualizingProblem}
+          onClose={() => setVisualizingProblem(null)}
+        />
+      )}
+
       {/* Toast Notification Overlays */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm w-full">
         {toasts.map((toast) => (
