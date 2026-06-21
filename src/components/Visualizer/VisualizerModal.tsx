@@ -123,10 +123,14 @@ export default function VisualizerModal({ problem, onClose }: VisualizerModalPro
       const pid = problem.id;
 
       if (meta.visualizerType === "stringmap") {
-        if (!customS.trim() || !customT.trim()) {
-          throw new Error("Strings cannot be empty.");
+        const needsT = meta.defaultInput.hasOwnProperty("t") && meta.defaultInput.t !== undefined;
+        if (!customS.trim() || (needsT && !customT.trim())) {
+          throw new Error("Input strings cannot be empty.");
         }
-        parsedInput = { s: customS.trim(), t: customT.trim() };
+        parsedInput = { s: customS.trim() };
+        if (needsT) {
+          parsedInput.t = customT.trim();
+        }
       } else if (meta.visualizerType === "matrix2d") {
         parsedInput = { grid: meta.defaultInput.grid };
       } else {
@@ -179,7 +183,7 @@ export default function VisualizerModal({ problem, onClose }: VisualizerModalPro
     if (pid === "3_kadane’s_algorithm,_maximum_subarray_sum") return <KadaneVisualizer step={step} />;
     if (pid === "1_reverse_a_linkedlist_[iterative]") return <LinkedListVisualizer step={step} />;
     if (pid === "12_print_the_matrix_in_spiral_manner") return <SpiralMatrixVisualizer step={step} />;
-    if (pid === "6_check_if_two_strings_are_anagram_of_each_other") return <AnagramVisualizer step={step} />;
+    if (pid === "6_check_if_two_strings_are_anagram_of_each_other") return <AnagramVisualizer step={step} pid={pid} />;
     if (pid === "3_remove_duplicates_from_sorted_array") return <RemoveDuplicatesVisualizer step={step} />;
 
     // General archetype fallbacks
@@ -187,7 +191,7 @@ export default function VisualizerModal({ problem, onClose }: VisualizerModalPro
     if (type === "array1d") return <Array1DVisualizer step={step} />;
     if (type === "matrix2d") return <SpiralMatrixVisualizer step={step} />;
     if (type === "linkedlist") return <LinkedListVisualizer step={step} />;
-    if (type === "stringmap") return <AnagramVisualizer step={step} />;
+    if (type === "stringmap") return <AnagramVisualizer step={step} pid={pid} />;
     if (type === "recursion") return <RecursionTreeVisualizer step={step} />;
     
     return <div className="text-center font-bold uppercase text-red-500">Visualizer Component not found</div>;
@@ -253,26 +257,33 @@ export default function VisualizerModal({ problem, onClose }: VisualizerModalPro
                 
                 <form onSubmit={handleApplyInputs} className="mt-3 space-y-3 cursor-default">
                   {meta.visualizerType === "stringmap" ? (
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[10px] font-black uppercase text-gray-500">String S</label>
-                        <input
-                          type="text"
-                          value={customS}
-                          onChange={(e) => setCustomS(e.target.value)}
-                          className="border-2 border-black rounded p-1.5 font-bold text-xs uppercase bg-white outline-none"
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[10px] font-black uppercase text-gray-500">String T</label>
-                        <input
-                          type="text"
-                          value={customT}
-                          onChange={(e) => setCustomT(e.target.value)}
-                          className="border-2 border-black rounded p-1.5 font-bold text-xs uppercase bg-white outline-none"
-                        />
-                      </div>
-                    </div>
+                    (() => {
+                      const needsT = meta.defaultInput.hasOwnProperty("t") && meta.defaultInput.t !== undefined;
+                      return (
+                        <div className={needsT ? "grid grid-cols-2 gap-2" : "flex flex-col gap-1"}>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-black uppercase text-gray-500">String S</label>
+                            <input
+                              type="text"
+                              value={customS}
+                              onChange={(e) => setCustomS(e.target.value)}
+                              className="border-2 border-black rounded p-1.5 font-bold text-xs uppercase bg-white outline-none"
+                            />
+                          </div>
+                          {needsT && (
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] font-black uppercase text-gray-500">String T</label>
+                              <input
+                                type="text"
+                                value={customT}
+                                onChange={(e) => setCustomT(e.target.value)}
+                                className="border-2 border-black rounded p-1.5 font-bold text-xs uppercase bg-white outline-none"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()
                   ) : meta.visualizerType === "matrix2d" ? (
                     <p className="text-[10px] text-gray-400 font-bold uppercase select-text">
                       Matrix visualization runs on default simulation bounds.

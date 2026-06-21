@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { usePathname } from "next/navigation";
 
 interface Message {
   role: "user" | "assistant";
@@ -275,6 +277,9 @@ function GeminiLogo({ className = "w-6 h-6" }: { className?: string }) {
 
 
 export default function Chatbot() {
+  const { user, isGuest } = useAuth();
+  const pathname = usePathname();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -465,6 +470,10 @@ export default function Chatbot() {
       return <div key={index}>{formattedLines}</div>;
     });
   };
+
+  if (!user || isGuest || pathname !== "/dashboard") {
+    return null;
+  }
 
   return (
     <>

@@ -211,6 +211,59 @@ export function generateLongestCommonPrefixSteps(words: string[]) {
   return steps;
 }
 
+// 0. Remove Outermost Parentheses Step Generator
+export function generateOuterParenthesesSteps(s: string) {
+  const steps: any[] = [];
+  let opened = 0;
+  let result = "";
+
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    const prevOpened = opened;
+    
+    let added = false;
+    if (c === '(') {
+      if (opened > 0) {
+        result += c;
+        added = true;
+      }
+      opened++;
+    } else if (c === ')') {
+      if (opened > 1) {
+        result += c;
+        added = true;
+      }
+      opened--;
+    }
+
+    steps.push({
+      s,
+      t: result,
+      sIndex: i,
+      tIndex: -1,
+      freqMap: { opened: prevOpened, action: added ? `Appended '${c}'` : `Skipped outer '${c}'` },
+      state: "checking",
+      description: `Char '${c}' at index ${i}: opened count was ${prevOpened}. ${
+        added ? `Appended to result: "${result}"` : `Omitted outermost parenthesis.`
+      } New opened count: ${opened}.`,
+      codeLineMap: { "python-efficient": 3, "java-optimal": 4, "javascript-optimal": 3 }
+    });
+  }
+
+  steps.push({
+    s,
+    t: result,
+    sIndex: s.length,
+    tIndex: -1,
+    freqMap: { final_result: result },
+    state: "match",
+    description: `Outermost parentheses removed. Final string: "${result}".`,
+    codeLineMap: { "python-efficient": 6, "java-optimal": 7, "javascript-optimal": 6 }
+  });
+
+  return steps;
+}
+
 // 4. Isomorphic Strings (Using stringmap visualizer to show maps)
 export function generateIsomorphicSteps(s: string, t: string) {
   const steps: any[] = [];
@@ -314,7 +367,7 @@ export function generateSortByFrequencySteps(s: string) {
       s,
       t: result,
       sIndex: s.length,
-      tIndex: -1,
+      tIndex: result.length - 1,
       freqMap: { ...freq },
       state: "scanning_t",
       description: `Append char '${char}' repeated ${count} times. Result: "${result}".`,
@@ -646,19 +699,37 @@ export function generateSumOfBeautySteps(s: string) {
       }
 
       const beauty = maxFreq - minFreq;
-      if (beauty > 0) {
-        totalBeauty += beauty;
-        steps.push({
-          s,
-          t: s.slice(i, j + 1),
-          sIndex: i,
-          tIndex: j,
-          freqMap: { max_freq: maxFreq, min_freq: minFreq, beauty },
-          state: "checking",
-          description: `Substring "${s.slice(i, j + 1)}": Max freq = ${maxFreq}, Min freq = ${minFreq}. Beauty = ${beauty}. Total beauty = ${totalBeauty}.`,
-          codeLineMap: { "python-efficient": 6, "java-optimal": 8, "javascript-optimal": 6 }
-        });
+      totalBeauty += beauty;
+
+      const charFreqMap: Record<string, number> = {};
+      for (let c = 0; c < 26; c++) {
+        if (freq[c] > 0) {
+          charFreqMap[String.fromCharCode(97 + c)] = freq[c];
+        }
       }
+
+      steps.push({
+        s,
+        t: s.slice(i, j + 1),
+        sIndex: i,
+        tIndex: j,
+        freqMap: {
+          ...charFreqMap,
+          max_freq: maxFreq,
+          min_freq: minFreq,
+          beauty,
+          total_beauty: totalBeauty
+        },
+        state: "checking",
+        description: `Substring "${s.slice(i, j + 1)}": Max freq = ${maxFreq}, Min freq = ${minFreq}. Beauty = ${beauty}. Total beauty = ${totalBeauty}.`,
+        codeLineMap: {
+          "python-efficient": 6,
+          "java-optimal": 8,
+          "javascript-optimal": 6,
+          "python-shorter": 5,
+          "python-brute": 6
+        }
+      });
     }
   }
 
@@ -667,10 +738,16 @@ export function generateSumOfBeautySteps(s: string) {
     t: "",
     sIndex: -1,
     tIndex: -1,
-    freqMap: {},
+    freqMap: { total_beauty: totalBeauty },
     state: "match",
     description: `Beauty summing complete. Total sum of beauties of all substrings is ${totalBeauty}.`,
-    codeLineMap: { "python-efficient": 10, "java-optimal": 12, "javascript-optimal": 10 }
+    codeLineMap: {
+      "python-efficient": 10,
+      "java-optimal": 12,
+      "javascript-optimal": 10,
+      "python-shorter": 8,
+      "python-brute": 8
+    }
   });
 
   return steps;
@@ -713,9 +790,19 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
       s: "(()())(())",
       t: ""
     },
-    generateSteps: (input) => generateAnagramSteps(input.s, "(()())()"),
+    generateSteps: (input) => generateOuterParenthesesSteps(input.s),
     solutions: {
       python: [
+        {
+          label: "Shorter",
+          code: `def removeOuterParentheses(s):
+    res, opened = [], 0
+    for c in s:
+        if c == '(' and opened > 0: res.append(c)
+        if c == ')' and opened > 1: res.append(c)
+        opened += 1 if c == '(' else -1
+    return "".join(res)`
+        },
         {
           label: "Efficient",
           code: `def removeOuterParentheses(s):
@@ -725,6 +812,18 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
         if c == ')' and opened > 1: res.append(c)
         opened += 1 if c == '(' else -1
     return "".join(res)`
+        },
+        {
+          label: "Brute Force",
+          code: `def removeOuterParentheses(s):
+    res, opened, start = "", 0, 0
+    for i, c in enumerate(s):
+        if c == '(': opened += 1
+        else: opened -= 1
+        if opened == 0:
+            res += s[start + 1:i]
+            start = i + 1
+    return res`
         }
       ],
       java: [
@@ -764,7 +863,7 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
     description: "Reverse the order of words in string S, separating them with a single space.",
     visualizerType: "array1d",
     defaultInput: {
-      array: ["the", "sky", "is", "blue"], // array format parsed by visualizer
+      array: ["the", "sky", "is", "blue"],
       s: "the sky is blue"
     },
     generateSteps: (input) => generateReverseEveryWordSteps(input.s),
@@ -773,8 +872,26 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
         {
           label: "Shorter",
           code: `def reverseWords(s):
-    # Split by spaces and reverse word list
     return " ".join(s.split()[::-1])`
+        },
+        {
+          label: "Efficient",
+          code: `def reverseWords(s):
+    words = s.split()
+    l, r = 0, len(words) - 1
+    while l < r:
+        words[l], words[r] = words[r], words[l]
+        l, r = l + 1, r - 1
+    return " ".join(words)`
+        },
+        {
+          label: "Brute Force",
+          code: `def reverseWords(s):
+    words = s.split()
+    res = []
+    for i in range(len(words) - 1, -1, -1):
+        res.append(words[i])
+    return " ".join(res)`
         }
       ],
       java: [
@@ -813,13 +930,29 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def largestOddNumber(s):
+    return s.rstrip("02468")`
+        },
+        {
           label: "Efficient",
           code: `def largestOddNumber(s):
-    # Scan from right to find odd digit
     for i in range(len(s) - 1, -1, -1):
         if int(s[i]) % 2 != 0:
             return s[:i+1]
     return ""`
+        },
+        {
+          label: "Brute Force",
+          code: `def largestOddNumber(s):
+    max_odd = ""
+    for i in range(len(s)):
+        for j in range(i, len(s)):
+            sub = s[i:j+1]
+            if int(sub[-1]) % 2 != 0:
+                if not max_odd or int(sub) > int(max_odd):
+                    max_odd = sub
+    return max_odd`
         }
       ],
       java: [
@@ -862,6 +995,16 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def longestCommonPrefix(strs):
+    if not strs: return ""
+    s1, s2 = min(strs), max(strs)
+    for i, c in enumerate(s1):
+        if i >= len(s2) or c != s2[i]:
+            return s1[:i]
+    return s1`
+        },
+        {
           label: "Efficient",
           code: `def longestCommonPrefix(strs):
     if not strs: return ""
@@ -871,6 +1014,21 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
             if word[i] != char:
                 return min_word[:i]
     return min_word`
+        },
+        {
+          label: "Brute Force",
+          code: `def longestCommonPrefix(strs):
+    if not strs: return ""
+    prefix = strs[0]
+    for i in range(1, len(strs)):
+        new_pref = ""
+        for j in range(min(len(prefix), len(strs[i]))):
+            if prefix[j] == strs[i][j]:
+                new_pref += prefix[j]
+            else:
+                break
+        prefix = new_pref
+    return prefix`
         }
       ],
       java: [
@@ -922,6 +1080,11 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def isIsomorphic(s, t):
+    return len(set(s)) == len(set(t)) == len(set(zip(s, t)))`
+        },
+        {
           label: "Efficient",
           code: `def isIsomorphic(s, t):
     mapST, mapTS = {}, {}
@@ -932,6 +1095,15 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
             return False
         mapST[c1] = c2
         mapTS[c2] = c1
+    return True`
+        },
+        {
+          label: "Brute Force",
+          code: `def isIsomorphic(s, t):
+    if len(s) != len(t): return False
+    for i in range(len(s)):
+        if s.find(s[i]) != t.find(t[i]):
+            return False
     return True`
         }
       ],
@@ -981,10 +1153,31 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def rotateString(s, t):
+    return len(s) == len(t) and t in (s + s)`
+        },
+        {
           label: "Efficient",
           code: `def rotateString(s, t):
-    # S rotation must be a substring of S+S
-    return len(s) == len(t) and t in (s + s)`
+    if len(s) != len(t): return False
+    if s == t: return True
+    for i in range(len(s)):
+        if s[i:] + s[:i] == t:
+            return True
+    return False`
+        },
+        {
+          label: "Brute Force",
+          code: `def rotateString(s, t):
+    if len(s) != len(t): return False
+    s_chars = list(s)
+    for _ in range(len(s)):
+        first = s_chars.pop(0)
+        s_chars.append(first)
+        if "".join(s_chars) == t:
+            return True
+    return False`
         }
       ],
       java: [
@@ -1018,27 +1211,16 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
     },
     generateSteps: (input) => generateAnagramSteps(input.s, input.t),
     solutions: {
-      javascript: [
-        {
-          label: "Optimal",
-          code: `function isAnagram(s, t) {
-  if (s.length !== t.length) return false;
-  const count = {};
-  for (let char of s) count[char] = (count[char] || 0) + 1;
-  for (let char of t) {
-    if (!count[char]) return false;
-    count[char]--;
-  }
-  return true;
-}`,
-        },
-      ],
       python: [
         {
-          label: "Efficient (Hash Map count)",
+          label: "Shorter",
           code: `def isAnagram(s, t):
-    if len(s) != len(t):
-        return False
+    return sorted(s) == sorted(t)`
+        },
+        {
+          label: "Efficient",
+          code: `def isAnagram(s, t):
+    if len(s) != len(t): return False
     counts = {}
     for char in s:
         counts[char] = counts.get(char, 0) + 1
@@ -1046,20 +1228,20 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
         if char not in counts or counts[char] == 0:
             return False
         counts[char] -= 1
-    return True`,
+    return True`
         },
         {
-          label: "Easier (Char Sorting)",
+          label: "Brute Force",
           code: `def isAnagram(s, t):
-    if len(s) != len(t):
-        return False
-    return sorted(s) == sorted(t)`,
-        },
-        {
-          label: "Shorter (Custom Frequency)",
-          code: `def isAnagram(s, t):
-    return len(s) == len(t) and all(s.count(c) == t.count(c) for c in set(s))`,
-        },
+    if len(s) != len(t): return False
+    t_list = list(t)
+    for char in s:
+        if char in t_list:
+            t_list.remove(char)
+        else:
+            return False
+    return len(t_list) == 0`
+        }
       ],
       java: [
         {
@@ -1077,24 +1259,25 @@ export const step3StringsRegistry: Record<string, ProblemVisualizerMeta> = {
         }
         return true;
     }
-}`,
-        },
-        {
-          label: "Simple (Char Sorting)",
-          code: `import java.util.Arrays;
-class Solution {
-    public boolean isAnagram(String s, String t) {
-        if (s.length() != t.length()) return false;
-        char[] sChars = s.toCharArray();
-        char[] tChars = t.toCharArray();
-        Arrays.sort(sChars);
-        Arrays.sort(tChars);
-        return Arrays.equals(sChars, tChars);
-    }
-}`,
-        },
+}`
+        }
       ],
-    },
+      javascript: [
+        {
+          label: "Optimal",
+          code: `function isAnagram(s, t) {
+  if (s.length !== t.length) return false;
+  const count = {};
+  for (let char of s) count[char] = (count[char] || 0) + 1;
+  for (let char of t) {
+    if (!count[char]) return false;
+    count[char]--;
+  }
+  return true;
+}`
+        }
+      ]
+    }
   },
   "0_sort_characters_by_frequency": {
     problemName: "Sort Chars by Frequency",
@@ -1106,12 +1289,32 @@ class Solution {
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def frequencySort(s):
+    import collections
+    return "".join(c * cnt for c, cnt in collections.Counter(s).most_common())`
+        },
+        {
           label: "Efficient",
           code: `def frequencySort(s):
+    import collections
     counts = collections.Counter(s)
-    # Sort entries by frequency
     sorted_chars = sorted(counts.items(), key=lambda x: -x[1])
     return "".join(c * cnt for c, cnt in sorted_chars)`
+        },
+        {
+          label: "Brute Force",
+          code: `def frequencySort(s):
+    unique_chars = list(set(s))
+    for i in range(len(unique_chars)):
+        for j in range(i + 1, len(unique_chars)):
+            c1, c2 = unique_chars[i], unique_chars[j]
+            if s.count(c1) < s.count(c2):
+                unique_chars[i], unique_chars[j] = unique_chars[j], unique_chars[i]
+    res = ""
+    for char in unique_chars:
+        res += char * s.count(char)
+    return res`
         }
       ],
       java: [
@@ -1157,6 +1360,13 @@ class Solution {
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def maxDepth(s):
+    import itertools
+    depths = list(itertools.accumulate(1 if c == '(' else -1 if c == ')' else 0 for c in s))
+    return max(depths) if depths else 0`
+        },
+        {
           label: "Efficient",
           code: `def maxDepth(s):
     max_d = curr = 0
@@ -1166,6 +1376,20 @@ class Solution {
             max_d = max(max_d, curr)
         elif c == ')':
             curr -= 1
+    return max_d`
+        },
+        {
+          label: "Brute Force",
+          code: `def maxDepth(s):
+    stack = []
+    max_d = 0
+    for c in s:
+        if c == '(':
+            stack.append('(')
+            max_d = max(max_d, len(stack))
+        elif c == ')':
+            if stack:
+                stack.pop()
     return max_d`
         }
       ],
@@ -1209,6 +1433,13 @@ class Solution {
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def romanToInt(s):
+    r_map = {'I':1, 'V':5, 'X':10, 'L':50, 'C':100, 'D':500, 'M':1000}
+    s = s.replace("IV", "IIII").replace("IX", "VIIII").replace("XL", "XXXX").replace("XC", "LXXXX").replace("CD", "CCCC").replace("CM", "DCCCC")
+    return sum(r_map[c] for c in s)`
+        },
+        {
           label: "Efficient",
           code: `def romanToInt(s):
     r_map = {'I':1, 'V':5, 'X':10, 'L':50, 'C':100, 'D':500, 'M':1000}
@@ -1221,6 +1452,21 @@ class Solution {
             i += 2
         else:
             total += c1
+            i += 1
+    return total`
+        },
+        {
+          label: "Brute Force",
+          code: `def romanToInt(s):
+    r_map = {'I':1, 'V':5, 'X':10, 'L':50, 'C':100, 'D':500, 'M':1000}
+    total = 0
+    i = 0
+    while i < len(s):
+        if i + 1 < len(s) and s[i:i+2] in ["IV", "IX", "XL", "XC", "CD", "CM"]:
+            total += r_map[s[i+1]] - r_map[s[i]]
+            i += 2
+        else:
+            total += r_map[s[i]]
             i += 1
     return total`
         }
@@ -1277,6 +1523,15 @@ class Solution {
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def myAtoi(s):
+    import re
+    match = re.match(r'^\\s*([+-]?\\d+)', s)
+    if not match: return 0
+    val = int(match.group(1))
+    return max(-2147483648, min(2147483647, val))`
+        },
+        {
           label: "Efficient",
           code: `def myAtoi(s):
     s = s.lstrip()
@@ -1290,6 +1545,25 @@ class Solution {
         if res * sign < -2147483648: return -2147483648
         i += 1
     return res * sign`
+        },
+        {
+          label: "Brute Force",
+          code: `def myAtoi(s):
+    cleaned = ""
+    for c in s:
+        if not cleaned and c == " ": continue
+        if not cleaned and c in ["-", "+"]:
+            cleaned += c
+            continue
+        if c.isdigit():
+            cleaned += c
+        else:
+            break
+    if not cleaned or cleaned in ["-", "+"]: return 0
+    val = int(cleaned)
+    if val > 2147483647: return 2147483647
+    if val < -2147483648: return -2147483648
+    return val`
         }
       ],
       java: [
@@ -1349,9 +1623,23 @@ class Solution {
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def substrCount(s, k):
+    def atMost(k):
+        counts, left, ans = {}, 0, 0
+        for right, c in enumerate(s):
+            counts[c] = counts.get(c, 0) + 1
+            while len(counts) > k:
+                counts[s[left]] -= 1
+                if counts[s[left]] == 0: del counts[s[left]]
+                left += 1
+            ans += (right - left + 1)
+        return ans
+    return atMost(k) - atMost(k - 1)`
+        },
+        {
           label: "Efficient",
           code: `def substrCount(s, k):
-    # Returns count of substrings with at most k distinct
     def atMost(k):
         counts = {}
         left = ans = distinct = 0
@@ -1365,6 +1653,20 @@ class Solution {
             ans += (right - left + 1)
         return ans
     return atMost(k) - atMost(k - 1)`
+        },
+        {
+          label: "Brute Force",
+          code: `def substrCount(s, k):
+    ans = 0
+    for i in range(len(s)):
+        distinct = set()
+        for j in range(i, len(s)):
+            distinct.add(s[j])
+            if len(distinct) == k:
+                ans += 1
+            elif len(distinct) > k:
+                break
+    return ans`
         }
       ],
       java: [
@@ -1429,16 +1731,43 @@ class Solution {
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def longestPalindrome(s):
+    if s == s[::-1]: return s
+    ans = ""
+    for i in range(len(s)):
+        for j in range(len(s), i, -1):
+            if len(s[i:j]) <= len(ans): break
+            if s[i:j] == s[i:j][::-1]:
+                ans = s[i:j]
+                break
+    return ans`
+        },
+        {
           label: "Efficient",
           code: `def longestPalindrome(s):
     start = end = 0
-    # Expand around odd & even index centers
+    def expand(l, r):
+        while l >= 0 and r < len(s) and s[l] == s[r]:
+            l, r = l - 1, r + 1
+        return l + 1, r - 1
     for i in range(len(s)):
-        l1, r1 = expand(s, i, i)
-        l2, r2 = expand(s, i, i + 1)
+        l1, r1 = expand(i, i)
+        l2, r2 = expand(i, i + 1)
         if r1 - l1 > end - start: start, end = l1, r1
         if r2 - l2 > end - start: start, end = l2, r2
     return s[start:end+1]`
+        },
+        {
+          label: "Brute Force",
+          code: `def longestPalindrome(s):
+    ans = ""
+    for i in range(len(s)):
+        for j in range(i, len(s)):
+            sub = s[i:j+1]
+            if sub == sub[::-1] and len(sub) > len(ans):
+                ans = sub
+    return ans`
         }
       ],
       java: [
@@ -1491,6 +1820,17 @@ class Solution {
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def beautySum(s):
+    import collections
+    return sum(
+        max(counts.values()) - min(counts.values())
+        for i in range(len(s))
+        for j in range(i, len(s))
+        for counts in [collections.Counter(s[i:j+1])]
+    )`
+        },
+        {
           label: "Efficient",
           code: `def beautySum(s):
     total = 0
@@ -1500,6 +1840,18 @@ class Solution {
             freq[ord(s[j]) - 97] += 1
             counts = [f for f in freq if f > 0]
             total += (max(counts) - min(counts))
+    return total`
+        },
+        {
+          label: "Brute Force",
+          code: `def beautySum(s):
+    total = 0
+    for i in range(len(s)):
+        for j in range(i, len(s)):
+            sub = s[i:j+1]
+            freq = {}
+            for c in sub: freq[c] = freq.get(c, 0) + 1
+            total += max(freq.values()) - min(freq.values())
     return total`
         }
       ],
@@ -1566,10 +1918,35 @@ class Solution {
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def reverseWords(s):
+    return " ".join(s.split()[::-1])`
+        },
+        {
           label: "Efficient",
           code: `def reverseWords(s):
-    # Splits, reverses, joins
-    return " ".join(s.split()[::-1])`
+    words = s.split()
+    n = len(words)
+    for i in range(n // 2):
+        words[i], words[n - 1 - i] = words[n - 1 - i], words[i]
+    return " ".join(words)`
+        },
+        {
+          label: "Brute Force",
+          code: `def reverseWords(s):
+    words = []
+    word = ""
+    for c in s:
+        if c != " ":
+            word += c
+        else:
+            if word:
+                words.append(word)
+                word = ""
+    if word: words.append(word)
+    rev = []
+    for w in words: rev.insert(0, w)
+    return " ".join(rev)`
         }
       ],
       java: [

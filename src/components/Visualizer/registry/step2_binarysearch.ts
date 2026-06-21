@@ -1369,47 +1369,17 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
       ],
       python: [
         {
-          label: "Efficient (Iterative)",
-          code: `def binarySearch(nums, target):
-    low, high = 0, len(nums) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if nums[mid] == target:
-            return mid
-        elif nums[mid] < target:
-            low = mid + 1
-        else:
-            high = mid - 1
-    return -1`,
+          label: "Shorter",
+          code: `def binarySearch(nums, target):\n    import bisect\n    idx = bisect.bisect_left(nums, target)\n    return idx if idx < len(nums) and nums[idx] == target else -1`
         },
         {
-          label: "Easier (Recursive)",
-          code: `def binarySearch(nums, target):
-    def helper(low, high):
-        if low > high:
-            return -1
-        mid = (low + high) // 2
-        if nums[mid] == target:
-            return mid
-        elif nums[mid] < target:
-            return helper(mid + 1, high)
-        else:
-            return helper(low, mid - 1)
-            
-    return helper(0, len(nums) - 1)`,
+          label: "Efficient",
+          code: `def binarySearch(nums, target):\n    low, high = 0, len(nums) - 1\n    while low <= high:\n        mid = (low + high) // 2\n        if nums[mid] == target: return mid\n        elif nums[mid] < target: low = mid + 1\n        else: high = mid - 1\n    return -1`
         },
         {
-          label: "Shorter (Custom Bisect)",
-          code: `def binarySearch(nums, target):
-    low, high = 0, len(nums) - 1
-    while low < high:
-        mid = (low + high) // 2
-        if nums[mid] < target:
-            low = mid + 1
-        else:
-            high = mid
-    return low if nums[low] == target else -1`,
-        },
+          label: "Brute Force",
+          code: `def binarySearch(nums, target):\n    for i in range(len(nums)):\n        if nums[i] == target: return i\n    return -1`
+        }
       ],
       java: [
         {
@@ -1460,18 +1430,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def lowerBound(arr, x):\n    import bisect\n    return bisect.bisect_left(arr, x)`
+        },
+        {
           label: "Efficient",
-          code: `def lowerBound(arr, x):
-    low, high = 0, len(arr) - 1
-    ans = len(arr)
-    while low <= high:
-        mid = (low + high) // 2
-        if arr[mid] >= x:
-            ans = mid
-            high = mid - 1
-        else:
-            low = mid + 1
-    return ans`
+          code: `def lowerBound(arr, x):\n    low, high = 0, len(arr) - 1\n    ans = len(arr)\n    while low <= high:\n        mid = (low + high) // 2\n        if arr[mid] >= x:\n            ans = mid\n            high = mid - 1\n        else:\n            low = mid + 1\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def lowerBound(arr, x):\n    for i in range(len(arr)):\n        if arr[i] >= x: return i\n    return len(arr)`
         }
       ],
       java: [
@@ -1529,18 +1497,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def upperBound(arr, x):\n    import bisect\n    return bisect.bisect_right(arr, x)`
+        },
+        {
           label: "Efficient",
-          code: `def upperBound(arr, x):
-    low, high = 0, len(arr) - 1
-    ans = len(arr)
-    while low <= high:
-        mid = (low + high) // 2
-        if arr[mid] > x:
-            ans = mid
-            high = mid - 1
-        else:
-            low = mid + 1
-    return ans`
+          code: `def upperBound(arr, x):\n    low, high = 0, len(arr) - 1\n    ans = len(arr)\n    while low <= high:\n        mid = (low + high) // 2\n        if arr[mid] > x:\n            ans = mid\n            high = mid - 1\n        else:\n            low = mid + 1\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def upperBound(arr, x):\n    for i in range(len(arr)):\n        if arr[i] > x: return i\n    return len(arr)`
         }
       ],
       java: [
@@ -1598,18 +1564,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def searchInsert(nums, target):\n    import bisect\n    return bisect.bisect_left(nums, target)`
+        },
+        {
           label: "Efficient",
-          code: `def searchInsert(nums, target):
-    low, high = 0, len(nums) - 1
-    ans = len(nums)
-    while low <= high:
-        mid = (low + high) // 2
-        if nums[mid] >= target:
-            ans = mid
-            high = mid - 1
-        else:
-            low = mid + 1
-    return ans`
+          code: `def searchInsert(nums, target):\n    low, high = 0, len(nums) - 1\n    ans = len(nums)\n    while low <= high:\n        mid = (low + high) // 2\n        if nums[mid] >= target:\n            ans = mid\n            high = mid - 1\n        else:\n            low = mid + 1\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def searchInsert(nums, target):\n    for i in range(len(nums)):\n        if nums[i] >= target: return i\n    return len(nums)`
         }
       ],
       java: [
@@ -1664,12 +1628,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def isSorted(arr):\n    return all(arr[i] <= arr[i+1] for i in range(len(arr)-1))`
+        },
+        {
           label: "Efficient",
-          code: `def isSorted(arr):
-    for i in range(len(arr) - 1):
-        if arr[i] > arr[i+1]:
-            return False
-    return True`
+          code: `def isSorted(arr):\n    for i in range(len(arr) - 1):\n        if arr[i] > arr[i+1]: return False\n    return True`
+        },
+        {
+          label: "Brute Force",
+          code: `def isSorted(arr):\n    for i in range(len(arr)):\n        for j in range(i + 1, len(arr)):\n            if arr[i] > arr[j]: return False\n    return True`
         }
       ],
       java: [
@@ -1711,28 +1679,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def firstAndLast(arr, target):\n    import bisect\n    l = bisect.bisect_left(arr, target)\n    r = bisect.bisect_right(arr, target) - 1\n    return [l, r] if l <= r else [-1, -1]`
+        },
+        {
           label: "Efficient",
-          code: `def searchRange(nums, target):
-    first, last = -1, -1
-    # Find first
-    l, h = 0, len(nums) - 1
-    while l <= h:
-        mid = (l + h) // 2
-        if nums[mid] == target:
-            first = mid
-            h = mid - 1
-        elif nums[mid] < target: l = mid + 1
-        else: h = mid - 1
-    # Find last
-    l, h = 0, len(nums) - 1
-    while l <= h:
-        mid = (l + h) // 2
-        if nums[mid] == target:
-            last = mid
-            l = mid + 1
-        elif nums[mid] < target: l = mid + 1
-        else: h = mid - 1
-    return [first, last]`
+          code: `def firstAndLast(arr, target):\n    def getBound(is_first):\n        low, high = 0, len(arr) - 1\n        ans = -1\n        while low <= high:\n            mid = (low + high) // 2\n            if arr[mid] == target:\n                ans = mid\n                if is_first: high = mid - 1\n                else: low = mid + 1\n            elif arr[mid] < target: low = mid + 1\n            else: high = mid - 1\n        return ans\n    return [getBound(True), getBound(False)]`
+        },
+        {
+          label: "Brute Force",
+          code: `def firstAndLast(arr, target):\n    first, last = -1, -1\n    for i in range(len(arr)):\n        if arr[i] == target:\n            if first == -1: first = i\n            last = i\n    return [first, last]`
         }
       ],
       java: [
@@ -1804,13 +1760,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def countOccurrences(arr, x):\n    import collections\n    return collections.Counter(arr)[x]`
+        },
+        {
           label: "Efficient",
-          code: `def count(arr, x):
-    # Combines first & last index search
-    first = findFirst(arr, x)
-    if first == -1: return 0
-    last = findLast(arr, x)
-    return last - first + 1`
+          code: `def countOccurrences(arr, x):\n    import bisect\n    return bisect.bisect_right(arr, x) - bisect.bisect_left(arr, x)`
+        },
+        {
+          label: "Brute Force",
+          code: `def countOccurrences(arr, x):\n    count = 0\n    for val in arr:\n        if val == x: count += 1\n    return count`
         }
       ],
       java: [
@@ -1849,21 +1808,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def findPeakElement(nums):\n    return nums.index(max(nums))`
+        },
+        {
           label: "Efficient",
-          code: `def findPeakElement(nums):
-    n = len(nums)
-    low, high = 0, n - 1
-    while low <= high:
-        mid = (low + high) // 2
-        # Check boundary peaks
-        left = nums[mid-1] if mid > 0 else float('-inf')
-        right = nums[mid+1] if mid < n - 1 else float('-inf')
-        if nums[mid] > left and nums[mid] > right:
-            return mid
-        elif nums[mid] < right:
-            low = mid + 1
-        else:
-            high = mid - 1`
+          code: `def findPeakElement(nums):\n    low, high = 0, len(nums) - 1\n    while low < high:\n        mid = (low + high) // 2\n        if nums[mid] > nums[mid + 1]: high = mid\n        else: low = mid + 1\n    return low`
+        },
+        {
+          label: "Brute Force",
+          code: `def findPeakElement(nums):\n    for i in range(len(nums)):\n        left_ok = i == 0 or nums[i] > nums[i-1]\n        right_ok = i == len(nums) - 1 or nums[i] > nums[i+1]\n        if left_ok and right_ok: return i\n    return 0`
         }
       ],
       java: [
@@ -1918,24 +1872,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def search(nums, target):\n    try: return nums.index(target)\n    except ValueError: return -1`
+        },
+        {
           label: "Efficient",
-          code: `def search(nums, target):
-    low, high = 0, len(nums) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if nums[mid] == target: return mid
-        # Left half sorted
-        if nums[low] <= nums[mid]:
-            if nums[low] <= target < nums[mid]:
-                high = mid - 1
-            else:
-                low = mid + 1
-        else: # Right half sorted
-            if nums[mid] < target <= nums[high]:
-                low = mid + 1
-            else:
-                high = mid - 1
-    return -1`
+          code: `def search(nums, target):\n    low, high = 0, len(nums) - 1\n    while low <= high:\n        mid = (low + high) // 2\n        if nums[mid] == target: return mid\n        if nums[low] <= nums[mid]:\n            if nums[low] <= target < nums[mid]: high = mid - 1\n            else: low = mid + 1\n        else:\n            if nums[mid] < target <= nums[high]: low = mid + 1\n            else: high = mid - 1\n    return -1`
+        },
+        {
+          label: "Brute Force",
+          code: `def search(nums, target):\n    for i in range(len(nums)):\n        if nums[i] == target: return i\n    return -1`
         }
       ],
       java: [
@@ -1995,24 +1941,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def search(nums, target):\n    return target in nums`
+        },
+        {
           label: "Efficient",
-          code: `def search(nums, target):
-    low, high = 0, len(nums) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if nums[mid] == target: return True
-        # Handle duplicates boundary shrink
-        if nums[low] == nums[mid] == nums[high]:
-            low += 1
-            high -= 1
-            continue
-        if nums[low] <= nums[mid]:
-            if nums[low] <= target < nums[mid]: high = mid - 1
-            else: low = mid + 1
-        else:
-            if nums[mid] < target <= nums[high]: low = mid + 1
-            else: high = mid - 1
-    return False`
+          code: `def search(nums, target):\n    low, high = 0, len(nums) - 1\n    while low <= high:\n        mid = (low + high) // 2\n        if nums[mid] == target: return True\n        if nums[low] == nums[mid] == nums[high]:\n            low, high = low + 1, high - 1\n            continue\n        if nums[low] <= nums[mid]:\n            if nums[low] <= target < nums[mid]: high = mid - 1\n            else: low = mid + 1\n        else:\n            if nums[mid] < target <= nums[high]: low = mid + 1\n            else: high = mid - 1\n    return False`
+        },
+        {
+          label: "Brute Force",
+          code: `def search(nums, target):\n    for val in nums:\n        if val == target: return True\n    return False`
         }
       ],
       java: [
@@ -2077,22 +2015,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def findMin(nums):\n    return min(nums)`
+        },
+        {
           label: "Efficient",
-          code: `def findMin(nums):
-    low, high = 0, len(nums) - 1
-    ans = float('inf')
-    while low <= high:
-        # Full sorted range check
-        if nums[low] <= nums[high]:
-            return min(ans, nums[low])
-        mid = (low + high) // 2
-        if nums[low] <= nums[mid]:
-            ans = min(ans, nums[low])
-            low = mid + 1
-        else:
-            ans = min(ans, nums[mid])
-            high = mid - 1
-    return ans`
+          code: `def findMin(nums):\n    low, high = 0, len(nums) - 1\n    ans = float('inf')\n    while low <= high:\n        mid = (low + high) // 2\n        if nums[low] <= nums[high]:\n            ans = min(ans, nums[low])\n            break\n        if nums[low] <= nums[mid]:\n            ans = min(ans, nums[low])\n            low = mid + 1\n        else:\n            ans = min(ans, nums[mid])\n            high = mid - 1\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def findMin(nums):\n    mini = nums[0]\n    for val in nums:\n        if val < mini: mini = val\n    return mini`
         }
       ],
       java: [
@@ -2151,23 +2083,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def singleNonDuplicate(nums):\n    import functools, operator\n    return functools.reduce(operator.xor, nums)`
+        },
+        {
           label: "Efficient",
-          code: `def singleNonDuplicate(nums):
-    n = len(nums)
-    if n == 1: return nums[0]
-    if nums[0] != nums[1]: return nums[0]
-    if nums[n-1] != nums[n-2]: return nums[n-1]
-    low, high = 1, n - 2
-    while low <= high:
-        mid = (low + high) // 2
-        if nums[mid] != nums[mid-1] and nums[mid] != nums[mid+1]:
-            return nums[mid]
-        # Align even/odd checks
-        if (mid % 2 == 0 and nums[mid] == nums[mid+1]) or \\
-           (mid % 2 != 0 and nums[mid] == nums[mid-1]):
-            low = mid + 1
-        else:
-            high = mid - 1`
+          code: `def singleNonDuplicate(nums):\n    low, high = 0, len(nums) - 1\n    while low < high:\n        mid = (low + high) // 2\n        if mid % 2 == 1: mid -= 1\n        if nums[mid] == nums[mid + 1]: low = mid + 2\n        else: high = mid\n    return nums[low]`
+        },
+        {
+          label: "Brute Force",
+          code: `def singleNonDuplicate(nums):\n    for i in range(0, len(nums) - 1, 2):\n        if nums[i] != nums[i+1]: return nums[i]\n    return nums[-1]`
         }
       ],
       java: [
@@ -2234,22 +2159,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def kthElement(arr1, arr2, k):\n    return sorted(arr1 + arr2)[k-1]`
+        },
+        {
           label: "Efficient",
-          code: `def kthElement(nums1, nums2, k):
-    n1, n2 = len(nums1), len(nums2)
-    if n1 > n2: return kthElement(nums2, nums1, k)
-    low, high = max(0, k - n2), min(k, n1)
-    while low <= high:
-        cut1 = (low + high) // 2
-        cut2 = k - cut1
-        l1 = nums1[cut1-1] if cut1 > 0 else float('-inf')
-        l2 = nums2[cut2-1] if cut2 > 0 else float('-inf')
-        r1 = nums1[cut1] if cut1 < n1 else float('inf')
-        r2 = nums2[cut2] if cut2 < n2 else float('inf')
-        if l1 <= r2 and l2 <= r1:
-            return max(l1, l2)
-        elif l1 > r2: high = cut1 - 1
-        else: low = cut1 + 1`
+          code: `def kthElement(arr1, arr2, k):\n    n, m = len(arr1), len(arr2)\n    if n > m: return kthElement(arr2, arr1, k)\n    low, high = max(0, k - m), min(k, n)\n    while low <= high:\n        cut1 = (low + high) // 2\n        cut2 = k - cut1\n        l1 = arr1[cut1-1] if cut1 > 0 else float('-inf')\n        l2 = arr2[cut2-1] if cut2 > 0 else float('-inf')\n        r1 = arr1[cut1] if cut1 < n else float('inf')\n        r2 = arr2[cut2] if cut2 < m else float('inf')\n        if l1 <= r2 and l2 <= r1: return max(l1, l2)\n        elif l1 > r2: high = cut1 - 1\n        else: low = cut1 + 1\n    return 1`
+        },
+        {
+          label: "Brute Force",
+          code: `def kthElement(arr1, arr2, k):\n    i = j = count = 0\n    while i < len(arr1) and j < len(arr2):\n        if arr1[i] < arr2[j]:\n            val = arr1[i]; i += 1\n        else:\n            val = arr2[j]; j += 1\n        count += 1\n        if count == k: return val\n    while i < len(arr1):\n        count += 1\n        if count == k: return arr1[i]\n        i += 1\n    while j < len(arr2):\n        count += 1\n        if count == k: return arr2[j]\n        j += 1\n    return -1`
         }
       ],
       java: [
@@ -2310,29 +2229,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def findKRotation(arr):\n    return arr.index(min(arr))`
+        },
+        {
           label: "Efficient",
-          code: `def findKRotation(arr):
-    # Same as finding index of minimum element
-    low, high = 0, len(arr) - 1
-    ans = float('inf')
-    index = -1
-    while low <= high:
-        if arr[low] <= arr[high]:
-            if arr[low] < ans:
-                index = low
-            break
-        mid = (low + high) // 2
-        if arr[low] <= arr[mid]:
-            if arr[low] < ans:
-                ans = arr[low]
-                index = low
-            low = mid + 1
-        else:
-            if arr[mid] < ans:
-                ans = arr[mid]
-                index = mid
-            high = mid - 1
-    return index`
+          code: `def findKRotation(arr):\n    low, high = 0, len(arr) - 1\n    while low <= high:\n        if arr[low] <= arr[high]: return low\n        mid = (low + high) // 2\n        next_idx = (mid + 1) % len(arr)\n        prev_idx = (mid - 1 + len(arr)) % len(arr)\n        if arr[mid] <= arr[next_idx] and arr[mid] <= arr[prev_idx]: return mid\n        if arr[mid] >= arr[low]: low = mid + 1\n        else: high = mid - 1\n    return 0`
+        },
+        {
+          label: "Brute Force",
+          code: `def findKRotation(arr):\n    for i in range(1, len(arr)):\n        if arr[i] < arr[i-1]: return i\n    return 0`
         }
       ],
       java: [
@@ -2418,20 +2324,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def searchMatrix(matrix, target):\n    return any(target in row for row in matrix)`
+        },
+        {
           label: "Efficient",
-          code: `def searchMatrix(matrix, target):
-    R, C = len(matrix), len(matrix[0])
-    low, high = 0, R * C - 1
-    while low <= high:
-        mid = (low + high) // 2
-        mid_val = matrix[mid // C][mid % C]
-        if mid_val == target:
-            return True
-        elif mid_val < target:
-            low = mid + 1
-        else:
-            high = mid - 1
-    return False`
+          code: `def searchMatrix(matrix, target):\n    R, C = len(matrix), len(matrix[0])\n    low, high = 0, R * C - 1\n    while low <= high:\n        mid = (low + high) // 2\n        r, c = mid // C, mid % C\n        if matrix[r][c] == target: return True\n        elif matrix[r][c] < target: low = mid + 1\n        else: high = mid - 1\n    return False`
+        },
+        {
+          label: "Brute Force",
+          code: `def searchMatrix(matrix, target):\n    for r in range(len(matrix)):\n        for c in range(len(matrix[0])):\n            if matrix[r][c] == target: return True\n    return False`
         }
       ],
       java: [
@@ -2488,24 +2390,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def findPeakGrid(g):\n    val = max(max(row) for row in g)\n    for r in range(len(g)):\n        if val in g[r]: return [r, g[r].index(val)]`
+        },
+        {
           label: "Efficient",
-          code: `def findPeakGrid(matrix):
-    R, C = len(matrix), len(matrix[0])
-    lowCol, highCol = 0, C - 1
-    while lowCol <= highCol:
-        midCol = (lowCol + highCol) // 2
-        # Find max element in midCol column
-        maxRow = 0
-        for r in range(R):
-            if matrix[r][midCol] > matrix[maxRow][midCol]:
-                maxRow = r
-        val = matrix[maxRow][midCol]
-        left = matrix[maxRow][midCol-1] if midCol > 0 else -1
-        right = matrix[maxRow][midCol+1] if midCol < C - 1 else -1
-        if val >= left and val >= right:
-            return [maxRow, midCol]
-        elif val < left: highCol = midCol - 1
-        else: lowCol = midCol + 1`
+          code: `def findPeakGrid(g):\n    R, C = len(g), len(g[0])\n    low, high = 0, C - 1\n    while low <= high:\n        mid = (low + high) // 2\n        max_r = 0\n        for r in range(R):\n            if g[r][mid] > g[max_r][mid]: max_r = r\n        left_ok = mid == 0 or g[max_r][mid] > g[max_r][mid - 1]\n        right_ok = mid == C - 1 or g[max_r][mid] > g[max_r][mid + 1]\n        if left_ok and right_ok: return [max_r, mid]\n        elif mid > 0 and g[max_r][mid - 1] > g[max_r][mid]: high = mid - 1\n        else: low = mid + 1\n    return [-1, -1]`
+        },
+        {
+          label: "Brute Force",
+          code: `def findPeakGrid(g):\n    R, C = len(g), len(g[0])\n    for r in range(R):\n        for c in range(C):\n            up = g[r-1][c] if r > 0 else -1\n            down = g[r+1][c] if r < R - 1 else -1\n            left = g[r][c-1] if c > 0 else -1\n            right = g[r][c+1] if c < C - 1 else -1\n            if g[r][c] > max(up, down, left, right): return [r, c]\n    return [0, 0]`
         }
       ],
       java: [
@@ -2574,18 +2468,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def findMedian(matrix):\n    flat = sorted(val for row in matrix for val in row)\n    return flat[len(flat) // 2]`
+        },
+        {
           label: "Efficient",
-          code: `def median(matrix, r, c):
-    low = min(matrix[i][0] for i in range(r))
-    high = max(matrix[i][c-1] for i in range(r))
-    target = (r * c) // 2 + 1
-    while low <= high:
-        mid = (low + high) // 2
-        # Count elements <= mid
-        count = sum(bisect.bisect_right(matrix[i], mid) for i in range(r))
-        if count < target: low = mid + 1
-        else: high = mid - 1
-    return low`
+          code: `def findMedian(matrix):\n    import bisect\n    R, C = len(matrix), len(matrix[0])\n    low = min(matrix[r][0] for r in range(R))\n    high = max(matrix[r][C-1] for r in range(R))\n    req = (R * C + 1) // 2\n    while low <= high:\n        mid = (low + high) // 2\n        count = sum(bisect.bisect_right(matrix[r], mid) for r in range(R))\n        if count < req: low = mid + 1\n        else: high = mid - 1\n    return low`
+        },
+        {
+          label: "Brute Force",
+          code: `def findMedian(matrix):\n    flat = []\n    for r in range(len(matrix)):\n        for c in range(len(matrix[0])): flat.append(matrix[r][c])\n    flat.sort()\n    return flat[len(flat) // 2]`
         }
       ],
       java: [
@@ -2649,18 +2541,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def floorSqrt(n):\n    import math\n    return int(math.isqrt(n))`
+        },
+        {
           label: "Efficient",
-          code: `def floorSqrt(n):
-    low, high = 1, n
-    ans = 0
-    while low <= high:
-        mid = (low + high) // 2
-        if mid * mid <= n:
-            ans = mid
-            low = mid + 1
-        else:
-            high = mid - 1
-    return ans`
+          code: `def floorSqrt(n):\n    low, high = 1, n\n    ans = 1\n    while low <= high:\n        mid = (low + high) // 2\n        if mid * mid <= n:\n            ans = mid\n            low = mid + 1\n        else:\n            high = mid - 1\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def floorSqrt(n):\n    ans = 1\n    while ans * ans <= n: ans += 1\n    return ans - 1`
         }
       ],
       java: [
@@ -2718,19 +2608,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def nthRoot(n, m):\n    val = round(m ** (1 / n))\n    return val if val ** n == m else -1`
+        },
+        {
           label: "Efficient",
-          code: `def NthRoot(n, m):
-    low, high = 1, m
-    while low <= high:
-        mid = (low + high) // 2
-        mid_pow = mid ** n
-        if mid_pow == m:
-            return mid
-        elif mid_pow < m:
-            low = mid + 1
-        else:
-            high = mid - 1
-    return -1`
+          code: `def nthRoot(n, m):\n    low, high = 1, m\n    while low <= high:\n        mid = (low + high) // 2\n        val = mid ** n\n        if val == m: return mid\n        elif val < m: low = mid + 1\n        else: high = mid - 1\n    return -1`
+        },
+        {
+          label: "Brute Force",
+          code: `def nthRoot(n, m):\n    ans = 1\n    while ans ** n <= m:\n        if ans ** n == m: return ans\n        ans += 1\n    return -1`
         }
       ],
       java: [
@@ -2782,20 +2669,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def minEatingSpeed(piles, h):\n    import math, bisect\n    return bisect.bisect_left(range(1, max(piles) + 1), True, key=lambda k: sum(math.ceil(p / k) for p in piles) <= h) + 1`
+        },
+        {
           label: "Efficient",
-          code: `def minEatingSpeed(piles, h):
-    low, high = 1, max(piles)
-    ans = high
-    while low <= high:
-        mid = (low + high) // 2
-        # Calculate hours needed at mid speed
-        hours = sum(math.ceil(p / mid) for p in piles)
-        if hours <= h:
-            ans = mid
-            high = mid - 1
-        else:
-            low = mid + 1
-    return ans`
+          code: `def minEatingSpeed(piles, h):\n    import math\n    low, high = 1, max(piles)\n    ans = high\n    while low <= high:\n        mid = (low + high) // 2\n        hours = sum(math.ceil(p / mid) for p in piles)\n        if hours <= h:\n            ans = mid\n            high = mid - 1\n        else:\n            low = mid + 1\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def minEatingSpeed(piles, h):\n    import math\n    speed = 1\n    while True:\n        hours = sum(math.ceil(p / speed) for p in piles)\n        if hours <= h: return speed\n        speed += 1`
         }
       ],
       java: [
@@ -2858,19 +2741,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def minDays(bloom, m, k):\n    if m * k > len(bloom): return -1\n    def feasible(d):\n        flow = bouq = 0\n        for b in bloom:\n            flow = flow + 1 if b <= d else 0\n            if flow == k: bouq, flow = bouq + 1, 0\n        return bouq >= m\n    low, high = min(bloom), max(bloom)\n    while low < high:\n        mid = (low + high) // 2\n        if feasible(mid): high = mid\n        else: low = mid + 1\n    return low`
+        },
+        {
           label: "Efficient",
-          code: `def minDays(bloomDay, m, k):
-    if len(bloomDay) < m * k: return -1
-    low, high = min(bloomDay), max(bloomDay)
-    ans = -1
-    while low <= high:
-        mid = (low + high) // 2
-        if canMake(bloomDay, m, k, mid):
-            ans = mid
-            high = mid - 1
-        else:
-            low = mid + 1
-    return ans`
+          code: `def minDays(bloom, m, k):\n    if m * k > len(bloom): return -1\n    def feasible(d):\n        flow = bouq = 0\n        for b in bloom:\n            if b <= d:\n                flow += 1\n                if flow == k: bouq, flow = bouq + 1, 0\n            else: flow = 0\n        return bouq >= m\n    low, high = min(bloom), max(bloom)\n    ans = -1\n    while low <= high:\n        mid = (low + high) // 2\n        if feasible(mid): ans = mid; high = mid - 1\n        else: low = mid + 1\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def minDays(bloom, m, k):\n    if m * k > len(bloom): return -1\n    for day in range(min(bloom), max(bloom) + 1):\n        flow = bouq = 0\n        for b in bloom:\n            flow = flow + 1 if b <= day else 0\n            if flow == k: bouq, flow = bouq + 1, 0\n        if bouq >= m: return day\n    return -1`
         }
       ],
       java: [
@@ -2934,19 +2814,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def smallestDivisor(nums, threshold):\n    import math\n    low, high = 1, max(nums)\n    while low < high:\n        mid = (low + high) // 2\n        if sum(math.ceil(x / mid) for x in nums) <= threshold: high = mid\n        else: low = mid + 1\n    return low`
+        },
+        {
           label: "Efficient",
-          code: `def smallestDivisor(nums, threshold):
-    low, high = 1, max(nums)
-    ans = high
-    while low <= high:
-        mid = (low + high) // 2
-        sum_val = sum(math.ceil(n / mid) for n in nums)
-        if sum_val <= threshold:
-            ans = mid
-            high = mid - 1
-        else:
-            low = mid + 1
-    return ans`
+          code: `def smallestDivisor(nums, threshold):\n    import math\n    low, high = 1, max(nums)\n    ans = high\n    while low <= high:\n        mid = (low + high) // 2\n        total = sum(math.ceil(x / mid) for x in nums)\n        if total <= threshold:\n            ans = mid\n            high = mid - 1\n        else:\n            low = mid + 1\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def smallestDivisor(nums, threshold):\n    import math\n    div = 1\n    while True:\n        if sum(math.ceil(x / div) for x in nums) <= threshold: return div\n        div += 1`
         }
       ],
       java: [
@@ -3009,18 +2886,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def shipWithinDays(weights, days):\n    def feasible(cap):\n        d, cur = 1, 0\n        for w in weights:\n            if cur + w > cap: d, cur = d + 1, 0\n            cur += w\n        return d <= days\n    low, high = max(weights), sum(weights)\n    while low < high:\n        mid = (low + high) // 2\n        if feasible(mid): high = mid\n        else: low = mid + 1\n    return low`
+        },
+        {
           label: "Efficient",
-          code: `def shipWithinDays(weights, days):
-    low, high = max(weights), sum(weights)
-    ans = high
-    while low <= high:
-        mid = (low + high) // 2
-        if canShip(weights, days, mid):
-            ans = mid
-            high = mid - 1
-        else:
-            low = mid + 1
-    return ans`
+          code: `def shipWithinDays(weights, days):\n    def feasible(cap):\n        cur = 0; d = 1\n        for w in weights:\n            if cur + w > cap: d += 1; cur = 0\n            cur += w\n        return d <= days\n    low, high = max(weights), sum(weights)\n    ans = high\n    while low <= high:\n        mid = (low + high) // 2\n        if feasible(mid): ans = mid; high = mid - 1\n        else: low = mid + 1\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def shipWithinDays(weights, days):\n    cap = max(weights)\n    while True:\n        cur = 0; d = 1\n        for w in weights:\n            if cur + w > cap: d += 1; cur = 0\n            cur += w\n        if d <= days: return cap\n        cap += 1`
         }
       ],
       java: [
@@ -3083,24 +2958,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def findMedianSortedArrays(nums1, nums2):\n    arr = sorted(nums1 + nums2)\n    n = len(arr)\n    return arr[n//2] if n % 2 == 1 else (arr[n//2 - 1] + arr[n//2]) / 2.0`
+        },
+        {
           label: "Efficient",
-          code: `def findMedianSortedArrays(nums1, nums2):
-    n1, n2 = len(nums1), len(nums2)
-    if n1 > n2: return findMedianSortedArrays(nums2, nums1)
-    low, high = 0, n1
-    while low <= high:
-        cut1 = (low + high) // 2
-        cut2 = (n1 + n2 + 1) // 2 - cut1
-        l1 = nums1[cut1-1] if cut1 > 0 else float('-inf')
-        l2 = nums2[cut2-1] if cut2 > 0 else float('-inf')
-        r1 = nums1[cut1] if cut1 < n1 else float('inf')
-        r2 = nums2[cut2] if cut2 < n2 else float('inf')
-        if l1 <= r2 and l2 <= r1:
-            if (n1 + n2) % 2 == 0:
-                return (max(l1, l2) + min(r1, r2)) / 2.0
-            return max(l1, l2)
-        elif l1 > r2: high = cut1 - 1
-        else: low = cut1 + 1`
+          code: `def findMedianSortedArrays(nums1, nums2):\n    n1, n2 = len(nums1), len(nums2)\n    if n1 > n2: return findMedianSortedArrays(nums2, nums1)\n    low, high = 0, n1\n    while low <= high:\n        cut1 = (low + high) // 2\n        cut2 = (n1 + n2 + 1) // 2 - cut1\n        l1 = nums1[cut1-1] if cut1 > 0 else float('-inf')\n        l2 = nums2[cut2-1] if cut2 > 0 else float('-inf')\n        r1 = nums1[cut1] if cut1 < n1 else float('inf')\n        r2 = nums2[cut2] if cut2 < n2 else float('inf')\n        if l1 <= r2 and l2 <= r1:\n            if (n1 + n2) % 2 == 1: return max(l1, l2)\n            return (max(l1, l2) + min(r1, r2)) / 2.0\n        elif l1 > r2: high = cut1 - 1\n        else: low = cut1 + 1\n    return 0.0`
+        },
+        {
+          label: "Brute Force",
+          code: `def findMedianSortedArrays(nums1, nums2):\n    merged = []\n    i = j = 0\n    while i < len(nums1) and j < len(nums2):\n        if nums1[i] < nums2[j]: merged.append(nums1[i]); i += 1\n        else: merged.append(nums2[j]); j += 1\n    merged.extend(nums1[i:]); merged.extend(nums2[j:])\n    n = len(merged)\n    return merged[n//2] if n % 2 == 1 else (merged[n//2 - 1] + merged[n//2]) / 2.0`
         }
       ],
       java: [
@@ -3168,19 +3035,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def solve(stalls, k):\n    stalls.sort()\n    def feasible(d):\n        count, last = 1, stalls[0]\n        for i in range(1, len(stalls)):\n            if stalls[i] - last >= d: count, last = count + 1, stalls[i]\n        return count >= k\n    low, high = 1, stalls[-1] - stalls[0]\n    while low < high:\n        mid = (low + high + 1) // 2\n        if feasible(mid): low = mid\n        else: high = mid - 1\n    return low`
+        },
+        {
           label: "Efficient",
-          code: `def solve(n, k, stalls):
-    stalls.sort()
-    low, high = 1, stalls[-1] - stalls[0]
-    ans = 0
-    while low <= high:
-        mid = (low + high) // 2
-        if canPlace(stalls, k, mid):
-            ans = mid
-            low = mid + 1
-        else:
-            high = mid - 1
-    return ans`
+          code: `def solve(stalls, k):\n    stalls.sort()\n    def feasible(d):\n        count, last = 1, stalls[0]\n        for i in range(1, len(stalls)):\n            if stalls[i] - last >= d: count += 1; last = stalls[i]\n        return count >= k\n    low, high = 1, stalls[-1] - stalls[0]\n    ans = 1\n    while low <= high:\n        mid = (low + high) // 2\n        if feasible(mid): ans = mid; low = mid + 1\n        else: high = mid - 1\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def solve(stalls, k):\n    stalls.sort()\n    dist = 1\n    while True:\n        count, last = 1, stalls[0]\n        for i in range(1, len(stalls)):\n            if stalls[i] - last >= dist: count += 1; last = stalls[i]\n        if count < k: return dist - 1\n        dist += 1`
         }
       ],
       java: [
@@ -3240,19 +3104,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def findPages(arr, m):\n    if len(arr) < m: return -1\n    def feasible(cap):\n        std, pages = 1, 0\n        for x in arr:\n            if pages + x > cap: std, pages = std + 1, 0\n            pages += x\n        return std <= m\n    low, high = max(arr), sum(arr)\n    while low < high:\n        mid = (low + high) // 2\n        if feasible(mid): high = mid\n        else: low = mid + 1\n    return low`
+        },
+        {
           label: "Efficient",
-          code: `def findPages(arr, n, m):
-    if m > n: return -1
-    low, high = max(arr), sum(arr)
-    ans = high
-    while low <= high:
-        mid = (low + high) // 2
-        if isPossible(arr, m, mid):
-            ans = mid
-            high = mid - 1
-        else:
-            low = mid + 1
-    return ans`
+          code: `def findPages(arr, m):\n    if len(arr) < m: return -1\n    def feasible(cap):\n        std, pages = 1, 0\n        for x in arr:\n            if pages + x > cap: std += 1; pages = x\n            else: pages += x\n        return std <= m\n    low, high = max(arr), sum(arr)\n    ans = -1\n    while low <= high:\n        mid = (low + high) // 2\n        if feasible(mid): ans = mid; high = mid - 1\n        else: low = mid + 1\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def findPages(arr, m):\n    if len(arr) < m: return -1\n    cap = max(arr)\n    while True:\n        std, pages = 1, 0\n        for x in arr:\n            if pages + x > cap: std += 1; pages = x\n            else: pages += x\n        if std <= m: return cap\n        cap += 1`
         }
       ],
       java: [
@@ -3316,18 +3177,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def splitArray(nums, k):\n    def feasible(cap):\n        sub, cur = 1, 0\n        for x in nums:\n            if cur + x > cap: sub, cur = sub + 1, 0\n            cur += x\n        return sub <= k\n    low, high = max(nums), sum(nums)\n    while low < high:\n        mid = (low + high) // 2\n        if feasible(mid): high = mid\n        else: low = mid + 1\n    return low`
+        },
+        {
           label: "Efficient",
-          code: `def splitArray(nums, k):
-    low, high = max(nums), sum(nums)
-    ans = high
-    while low <= high:
-        mid = (low + high) // 2
-        if canSplit(nums, k, mid):
-            ans = mid
-            high = mid - 1
-        else:
-            low = mid + 1
-    return ans`
+          code: `def splitArray(nums, k):\n    def feasible(cap):\n        sub, cur = 1, 0\n        for x in nums:\n            if cur + x > cap: sub += 1; cur = x\n            else: cur += x\n        return sub <= k\n    low, high = max(nums), sum(nums)\n    ans = -1\n    while low <= high:\n        mid = (low + high) // 2\n        if feasible(mid): ans = mid; high = mid - 1\n        else: low = mid + 1\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def splitArray(nums, k):\n    cap = max(nums)\n    while True:\n        sub, cur = 1, 0\n        for x in nums:\n            if cur + x > cap: sub += 1; cur = x\n            else: cur += x\n        if sub <= k: return cap\n        cap += 1`
         }
       ],
       java: [
@@ -3389,17 +3248,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def findKthPositive(arr, k):\n    for x in arr:\n        if x <= k: k += 1\n        else: break\n    return k`
+        },
+        {
           label: "Efficient",
-          code: `def findKthPositive(arr, k):
-    low, high = 0, len(arr) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        missing = arr[mid] - (mid + 1)
-        if missing < k:
-            low = mid + 1
-        else:
-            high = mid - 1
-    return low + k`
+          code: `def findKthPositive(arr, k):\n    low, high = 0, len(arr) - 1\n    while low <= high:\n        mid = (low + high) // 2\n        missing = arr[mid] - (mid + 1)\n        if missing < k: low = mid + 1\n        else: high = mid - 1\n    return low + k`
+        },
+        {
+          label: "Brute Force",
+          code: `def findKthPositive(arr, k):\n    num = 1; missing = 0\n    while True:\n        if num not in arr:\n            missing += 1\n            if missing == k: return num\n        num += 1`
         }
       ],
       java: [
@@ -3449,18 +3307,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def minmaxGasDist(stations, k):\n    low, high = 0, stations[-1] - stations[0]\n    while high - low > 1e-6:\n        mid = (low + high) / 2\n        if sum(int((stations[i+1] - stations[i]) / mid) for i in range(len(stations)-1)) <= k: high = mid\n        else: low = mid + 1e-6\n    return low`
+        },
+        {
           label: "Efficient",
-          code: `def findSmallestMaxDist(stations, k):
-    low = 0
-    high = max(stations[i+1] - stations[i] for i in range(len(stations)-1))
-    # Float binary search
-    while high - low > 1e-6:
-        mid = (low + high) / 2.0
-        if canPlace(stations, k, mid):
-            high = mid
-        else:
-            low = mid
-    return high`
+          code: `def minmaxGasDist(stations, k):\n    def feasible(d):\n        count = 0\n        for i in range(len(stations) - 1):\n            count += int((stations[i+1] - stations[i]) / d)\n        return count <= k\n    low, high = 0, stations[-1] - stations[0]\n    ans = high\n    for _ in range(80):\n        mid = (low + high) / 2.0\n        if feasible(mid): ans = mid; high = mid\n        else: low = mid\n    return ans`
+        },
+        {
+          label: "Brute Force",
+          code: `def minmaxGasDist(stations, k):\n    import heapq\n    intervals = []\n    for i in range(len(stations) - 1):\n        diff = stations[i+1] - stations[i]\n        heapq.heappush(intervals, (-diff, diff, 1))\n    for _ in range(k):\n        neg_val, total_diff, count = heapq.heappop(intervals)\n        count += 1\n        heapq.heappush(intervals, (-(total_diff / count), total_diff, count))\n    return -intervals[0][0]`
         }
       ],
       java: [
@@ -3515,24 +3371,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def findMedianSortedArrays(nums1, nums2):\n    arr = sorted(nums1 + nums2)\n    n = len(arr)\n    return arr[n//2] if n % 2 == 1 else (arr[n//2 - 1] + arr[n//2]) / 2.0`
+        },
+        {
           label: "Efficient",
-          code: `def findMedianSortedArrays(nums1, nums2):
-    n1, n2 = len(nums1), len(nums2)
-    if n1 > n2: return findMedianSortedArrays(nums2, nums1)
-    low, high = 0, n1
-    while low <= high:
-        cut1 = (low + high) // 2
-        cut2 = (n1 + n2 + 1) // 2 - cut1
-        l1 = nums1[cut1-1] if cut1 > 0 else float('-inf')
-        l2 = nums2[cut2-1] if cut2 > 0 else float('-inf')
-        r1 = nums1[cut1] if cut1 < n1 else float('inf')
-        r2 = nums2[cut2] if cut2 < n2 else float('inf')
-        if l1 <= r2 and l2 <= r1:
-            if (n1 + n2) % 2 == 0:
-                return (max(l1, l2) + min(r1, r2)) / 2.0
-            return max(l1, l2)
-        elif l1 > r2: high = cut1 - 1
-        else: low = cut1 + 1`
+          code: `def findMedianSortedArrays(nums1, nums2):\n    n1, n2 = len(nums1), len(nums2)\n    if n1 > n2: return findMedianSortedArrays(nums2, nums1)\n    low, high = 0, n1\n    while low <= high:\n        cut1 = (low + high) // 2\n        cut2 = (n1 + n2 + 1) // 2 - cut1\n        l1 = nums1[cut1-1] if cut1 > 0 else float('-inf')\n        l2 = nums2[cut2-1] if cut2 > 0 else float('-inf')\n        r1 = nums1[cut1] if cut1 < n1 else float('inf')\n        r2 = nums2[cut2] if cut2 < n2 else float('inf')\n        if l1 <= r2 and l2 <= r1:\n            if (n1 + n2) % 2 == 1: return max(l1, l2)\n            return (max(l1, l2) + min(r1, r2)) / 2.0\n        elif l1 > r2: high = cut1 - 1\n        else: low = cut1 + 1\n    return 0.0`
+        },
+        {
+          label: "Brute Force",
+          code: `def findMedianSortedArrays(nums1, nums2):\n    merged = []\n    i = j = 0\n    while i < len(nums1) and j < len(nums2):\n        if nums1[i] < nums2[j]: merged.append(nums1[i]); i += 1\n        else: merged.append(nums2[j]); j += 1\n    merged.extend(nums1[i:]); merged.extend(nums2[j:])\n    n = len(merged)\n    return merged[n//2] if n % 2 == 1 else (merged[n//2 - 1] + merged[n//2]) / 2.0`
         }
       ],
       java: [
@@ -3601,22 +3449,16 @@ export const step2BinarySearchRegistry: Record<string, ProblemVisualizerMeta> = 
     solutions: {
       python: [
         {
+          label: "Shorter",
+          code: `def kthElement(arr1, arr2, k):\n    return sorted(arr1 + arr2)[k-1]`
+        },
+        {
           label: "Efficient",
-          code: `def kthElement(nums1, nums2, k):
-    n1, n2 = len(nums1), len(nums2)
-    if n1 > n2: return kthElement(nums2, nums1, k)
-    low, high = max(0, k - n2), min(k, n1)
-    while low <= high:
-        cut1 = (low + high) // 2
-        cut2 = k - cut1
-        l1 = nums1[cut1-1] if cut1 > 0 else float('-inf')
-        l2 = nums2[cut2-1] if cut2 > 0 else float('-inf')
-        r1 = nums1[cut1] if cut1 < n1 else float('inf')
-        r2 = nums2[cut2] if cut2 < n2 else float('inf')
-        if l1 <= r2 and l2 <= r1:
-            return max(l1, l2)
-        elif l1 > r2: high = cut1 - 1
-        else: low = cut1 + 1`
+          code: `def kthElement(arr1, arr2, k):\n    n, m = len(arr1), len(arr2)\n    if n > m: return kthElement(arr2, arr1, k)\n    low, high = max(0, k - m), min(k, n)\n    while low <= high:\n        cut1 = (low + high) // 2\n        cut2 = k - cut1\n        l1 = arr1[cut1-1] if cut1 > 0 else float('-inf')\n        l2 = arr2[cut2-1] if cut2 > 0 else float('-inf')\n        r1 = arr1[cut1] if cut1 < n else float('inf')\n        r2 = arr2[cut2] if cut2 < m else float('inf')\n        if l1 <= r2 and l2 <= r1: return max(l1, l2)\n        elif l1 > r2: high = cut1 - 1\n        else: low = cut1 + 1\n    return 1`
+        },
+        {
+          label: "Brute Force",
+          code: `def kthElement(arr1, arr2, k):\n    i = j = count = 0\n    while i < len(arr1) and j < len(arr2):\n        if arr1[i] < arr2[j]: val = arr1[i]; i += 1\n        else: val = arr2[j]; j += 1\n        count += 1\n        if count == k: return val\n    while i < len(arr1):\n        count += 1\n        if count == k: return arr1[i]\n        i += 1\n    while j < len(arr2):\n        count += 1\n        if count == k: return arr2[j]\n        j += 1\n    return -1`
         }
       ],
       java: [
