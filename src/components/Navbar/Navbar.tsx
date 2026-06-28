@@ -13,12 +13,22 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { name: "All", href: "/dashboard", color: "bg-white" },
+  { name: "Sandbox", href: "/visualizer-sandbox", color: "bg-neoYellow" },
   { name: "Arrays", href: "/arrays", color: "bg-neoPink" },
   { name: "Binary Search", href: "/binary-search", color: "bg-neoBlue" },
   { name: "Strings", href: "/strings", color: "bg-neoYellow" },
   { name: "Linked List", href: "/linked-list", color: "bg-neoGreen" },
   { name: "Recursion", href: "/recursion", color: "bg-neoPurple" },
   { name: "Two Pointers", href: "/two-pointers", color: "bg-neoRed" },
+  { name: "Bit Manipulation", href: "/bit-manipulation", color: "bg-neoYellow" },
+  { name: "Stack & Queue", href: "/stack-n-queue", color: "bg-neoGreen" },
+  { name: "Heaps", href: "/heaps", color: "bg-neoPink" },
+  { name: "Greedy", href: "/greedy", color: "bg-neoBlue" },
+  { name: "Binary Tree", href: "/binary-tree", color: "bg-neoPurple" },
+  { name: "Binary Search Tree", href: "/binary-search-tree", color: "bg-neoRed" },
+  { name: "Graphs", href: "/graphs", color: "bg-neoYellow" },
+  { name: "DP", href: "/dp", color: "bg-neoGreen" },
+  { name: "Tries", href: "/tries", color: "bg-neoPink" },
 ];
 
 export default function Navbar() {

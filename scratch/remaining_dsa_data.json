@@ -1,0 +1,849 @@
+{
+  "greedy": [
+    {
+      "title": "Step 1. Easy Problems",
+      "problems": [
+        {
+          "name": "Assign Cookies",
+          "cn": "",
+          "gfg": "",
+          "lc": "https://leetcode.com/problems/assign-cookies/"
+        },
+        {
+          "name": "Fractional Knapsack Problem",
+          "cn": "https://takeuforward.org/data-structure/fractional-knapsack-problem-greedy-approach/",
+          "gfg": "https://www.youtube.com/watch?v=F_DDzYnxO14&list=PLgUwDviBIf0p4ozDR_kJJkONnb1wdx2Ma&index=49",
+          "lc": "https://practice.geeksforgeeks.org/problems/fractional-knapsack-1587115620/1"
+        },
+        {
+          "name": "Greedy algorithm to find minimum",
+          "cn": "https://takeuforward.org/data-structure/find-minimum-number-of-coins/",
+          "gfg": "https://www.youtube.com/watch?v=mVg9CfJvayM&list=PLgUwDviBIf0p4ozDR_kJJkONnb1wdx2Ma&index=48",
+          "lc": "https://practice.geeksforgeeks.org/problems/-minimum-number-of-coins4426/1"
+        },
+        {
+          "name": "Lemonade Change",
+          "cn": "",
+          "gfg": "",
+          "lc": "https://leetcode.com/problems/lemonade-change/"
+        },
+        {
+          "name": "Valid Paranthesis Checker",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/parenthesis-checker2744/1",
+          "lc": "https://leetcode.com/problems/valid-parenthesis-string/"
+        }
+      ]
+    },
+    {
+      "title": "Step 2. Medium /Hard Problems",
+      "problems": [
+        {
+          "name": "N meetings in one room",
+          "cn": "https://takeuforward.org/data-structure/n-meetings-in-one-room/",
+          "gfg": "https://www.youtube.com/watch?v=II6ziNnub1Q&list=PLgUwDviBIf0p4ozDR_kJJkONnb1wdx2Ma&index=45",
+          "lc": "https://practice.geeksforgeeks.org/problems/n-meetings-in-one-room-1587115620/1"
+        },
+        {
+          "name": "Jump Game",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/jump-game/1",
+          "lc": "https://leetcode.com/problems/jump-game/"
+        },
+        {
+          "name": "Jump Game 2",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/minimum-number-of-jumps-1587115620/1",
+          "lc": "https://leetcode.com/problems/jump-game-ii/"
+        },
+        {
+          "name": "Minimum number of platforms required for a railway",
+          "cn": "https://takeuforward.org/data-structure/minimum-number-of-platforms-required-for-a-railway/",
+          "gfg": "https://www.youtube.com/watch?v=dxVcMDI7vyI&list=PLgUwDviBIf0p4ozDR_kJJkONnb1wdx2Ma&index=46",
+          "lc": "https://practice.geeksforgeeks.org/problems/minimum-platforms-1587115620/1"
+        },
+        {
+          "name": "Job sequencing Problem",
+          "cn": "https://takeuforward.org/data-structure/job-sequencing-problem/",
+          "gfg": "https://www.youtube.com/watch?v=LjPx4wQaRIs&list=PLgUwDviBIf0p4ozDR_kJJkONnb1wdx2Ma&index=47",
+          "lc": "https://practice.geeksforgeeks.org/problems/job-sequencing-problem-1587115620/1"
+        },
+        {
+          "name": "Candy",
+          "cn": "",
+          "gfg": "",
+          "lc": "https://leetcode.com/problems/candy/"
+        },
+        {
+          "name": "Program for Shortest Job First (or SJF) CPU Scheduling",
+          "cn": "",
+          "gfg": "",
+          "lc": ""
+        },
+        {
+          "name": "Program for Least Recently Used (LRU) Page Replacement Algorithm",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/page-faults-in-lru5603/1",
+          "lc": ""
+        },
+        {
+          "name": "Insert Interval",
+          "cn": "https://takeuforward.org/?s=Insert+Interval",
+          "gfg": "",
+          "lc": ""
+        },
+        {
+          "name": "Merge Intervals",
+          "cn": "https://takeuforward.org/data-structure/merge-overlapping-sub-intervals/",
+          "gfg": "https://www.youtube.com/watch?v=2JzRBPFYbKE&list=PLgUwDviBIf0rPG3Ictpu74YWBQ1CaBkm2&index=6",
+          "lc": "https://practice.geeksforgeeks.org/problems/8a644e94faaa94968d8665ba9e0a80d1ae3e0a2d/1"
+        },
+        {
+          "name": "Non-overlapping Intervals",
+          "cn": "",
+          "gfg": "",
+          "lc": "https://leetcode.com/problems/non-overlapping-intervals/"
+        }
+      ]
+    }
+  ],
+  "graphs": [
+    {
+      "title": "Step 1. Learning",
+      "problems": [
+        {
+          "name": "Graph and Types",
+          "cn": "https://takeuforward.org/graph/introduction-to-graph/",
+          "gfg": "https://youtu.be/M3_pLsDdeuU",
+          "lc": ""
+        },
+        {
+          "name": "Graph Representation | C++",
+          "cn": "https://takeuforward.org/graph/graph-representation-in-c/",
+          "gfg": "https://youtu.be/3oI-34aPMWM",
+          "lc": "https://practice.geeksforgeeks.org/problems/print-adjacency-list-1587115620/1"
+        },
+        {
+          "name": "Graph Representation | Java",
+          "cn": "https://youtu.be/3oI-34aPMWM",
+          "gfg": "https://practice.geeksforgeeks.org/problems/print-adjacency-list-1587115620/1",
+          "lc": ""
+        },
+        {
+          "name": "Connected Components | Logic Explanation",
+          "cn": "https://takeuforward.org/graph/connected-components-in-graphs/",
+          "gfg": "https://youtu.be/lea-Wl_uWXY",
+          "lc": "https://practice.geeksforgeeks.org/problems/number-of-provinces/1"
+        },
+        {
+          "name": "BFS",
+          "cn": "https://takeuforward.org/graph/breadth-first-search-bfs-level-order-traversal/",
+          "gfg": "https://youtu.be/-tgVpUgsQ5k",
+          "lc": "https://practice.geeksforgeeks.org/problems/bfs-traversal-of-graph/1"
+        },
+        {
+          "name": "DFS",
+          "cn": "https://takeuforward.org/data-structure/depth-first-search-dfs/",
+          "gfg": "https://youtu.be/Qzf1a--rhp8",
+          "lc": "https://practice.geeksforgeeks.org/problems/next-larger-element-1587115620/1"
+        }
+      ]
+    },
+    {
+      "title": "Step 2. Problems on BFS /DFS",
+      "problems": [
+        {
+          "name": "Number of provinces (leetcode)",
+          "cn": "https://takeuforward.org/data-structure/number-of-provinces/",
+          "gfg": "https://youtu.be/ACzkVtewUYA",
+          "lc": "https://practice.geeksforgeeks.org/problems/number-of-provinces/1"
+        },
+        {
+          "name": "Connected Components Problem in Matrix",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/number-of-provinces/1",
+          "lc": ""
+        },
+        {
+          "name": "Rotten Oranges",
+          "cn": "https://takeuforward.org/data-structure/rotten-oranges/",
+          "gfg": "https://youtu.be/yf3oUhkvqA0",
+          "lc": "https://practice.geeksforgeeks.org/problems/rotten-oranges2536/1"
+        },
+        {
+          "name": "Flood fill",
+          "cn": "https://takeuforward.org/graph/flood-fill-algorithm-graphs/",
+          "gfg": "https://youtu.be/C-2_uSRli8o",
+          "lc": "https://practice.geeksforgeeks.org/problems/flood-fill-algorithm1856/1"
+        },
+        {
+          "name": "Cycle Detection in unirected Graph (bfs)",
+          "cn": "https://takeuforward.org/data-structure/detect-cycle-in-an-undirected-graph-using-bfs/",
+          "gfg": "https://youtu.be/BPlrALf1LDU",
+          "lc": "https://practice.geeksforgeeks.org/problems/detect-cycle-in-an-undirected-graph/1"
+        },
+        {
+          "name": "Cycle Detection in undirected Graph (dfs)",
+          "cn": "https://takeuforward.org/data-structure/detect-cycle-in-an-undirected-graph-using-dfs/",
+          "gfg": "https://youtu.be/zQ3zgFypzX4",
+          "lc": "https://practice.geeksforgeeks.org/problems/detect-cycle-in-an-undirected-graph/1"
+        },
+        {
+          "name": "0/1 Matrix (Bfs Problem)",
+          "cn": "https://takeuforward.org/graph/distance-of-nearest-cell-having-1/",
+          "gfg": "https://www.youtube.com/watch?v=edXdVwkYHF8",
+          "lc": "https://practice.geeksforgeeks.org/problems/distance-of-nearest-cell-having-1-1587115620/1"
+        },
+        {
+          "name": "Surrounded Regions (dfs)",
+          "cn": "https://takeuforward.org/graph/surrounded-regions-replace-os-with-xs/",
+          "gfg": "https://www.youtube.com/watch?v=BtdgAys4yMk",
+          "lc": "https://practice.geeksforgeeks.org/problems/replace-os-with-xs0052/1"
+        },
+        {
+          "name": "Number of Enclaves [flood fill implementation \u2013 multisource]",
+          "cn": "https://takeuforward.org/graph/number-of-enclaves/",
+          "gfg": "https://www.youtube.com/watch?v=rxKcepXQgU4",
+          "lc": "https://practice.geeksforgeeks.org/problems/number-of-enclaves/1"
+        },
+        {
+          "name": "Word ladder \u2013 1",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/word-ladder/1",
+          "lc": "https://leetcode.com/problems/word-ladder/"
+        },
+        {
+          "name": "Word ladder \u2013 2",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/word-ladder-ii/1",
+          "lc": "https://leetcode.com/problems/word-ladder-ii/"
+        },
+        {
+          "name": "Number of Distinct Islands [dfs multisource]",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/number-of-distinct-islands/1",
+          "lc": "https://leetcode.com/problems/number-of-distinct-islands-ii/"
+        },
+        {
+          "name": "Bipartite Graph (DFS)",
+          "cn": "https://takeuforward.org/graph/bipartite-graph-dfs-implementation/",
+          "gfg": "https://www.youtube.com/watch?v=KG5YFfR0j8A",
+          "lc": "https://practice.geeksforgeeks.org/problems/bipartite-graph/1"
+        },
+        {
+          "name": "Cycle Detection in Directed Graph (DFS)",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/detect-cycle-in-a-directed-graph/1",
+          "lc": "https://leetcode.com/problems/course-schedule-ii/discuss/293048/detecting-cycle-in-directed-graph-problem"
+        }
+      ]
+    },
+    {
+      "title": "Step 3. Topo Sort and Problems",
+      "problems": [
+        {
+          "name": "Topo Sort",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/topological-sort/1",
+          "lc": ""
+        },
+        {
+          "name": "Kahn\u2019s Algorithm",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/topological-sort/1",
+          "lc": ""
+        },
+        {
+          "name": "Cycle Detection in Directed Graph (BFS)",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/detect-cycle-in-a-directed-graph/1",
+          "lc": ""
+        },
+        {
+          "name": "Course Schedule \u2013 I",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/course-schedule/1",
+          "lc": "https://leetcode.com/problems/course-schedule/"
+        },
+        {
+          "name": "Course Schedule \u2013 II",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/course-schedule/1",
+          "lc": "https://leetcode.com/problems/course-schedule-ii/"
+        },
+        {
+          "name": "Find eventual safe states",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/eventual-safe-states/1",
+          "lc": "https://leetcode.com/problems/find-eventual-safe-states/"
+        },
+        {
+          "name": "Alien dictionary",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/alien-dictionary/1",
+          "lc": "https://leetcode.com/problems/alien-dictionary/solution/"
+        }
+      ]
+    },
+    {
+      "title": "Step 4. Shortest Path Algorithms and Problems",
+      "problems": [
+        {
+          "name": "Shortest Path in UG with unit weights",
+          "cn": "",
+          "gfg": "",
+          "lc": ""
+        },
+        {
+          "name": "Shortest Path in DAG",
+          "cn": "",
+          "gfg": "",
+          "lc": ""
+        },
+        {
+          "name": "Djisktra\u2019s Algorithm",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/implementing-dijkstra-set-1-adjacency-matrix/1",
+          "lc": ""
+        },
+        {
+          "name": "Why priority Queue is used in Djisktra\u2019s Algorithm",
+          "cn": "",
+          "gfg": "",
+          "lc": ""
+        },
+        {
+          "name": "Shortest path in a binary maze",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/shortest-path-in-a-binary-maze-1655453161/1",
+          "lc": "https://leetcode.com/problems/shortest-path-in-binary-matrix/"
+        },
+        {
+          "name": "Path with minimum effort",
+          "cn": "",
+          "gfg": "",
+          "lc": "https://leetcode.com/problems/path-with-minimum-effort/"
+        },
+        {
+          "name": "Cheapest flights within k stops",
+          "cn": "",
+          "gfg": "",
+          "lc": "https://leetcode.com/problems/cheapest-flights-within-k-stops/"
+        },
+        {
+          "name": "Network Delay time",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/alex-travelling/1",
+          "lc": "https://leetcode.com/problems/network-delay-time/"
+        },
+        {
+          "name": "Number of ways to arrive at destination",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/number-of-ways-to-arrive-at-destination/1",
+          "lc": "https://leetcode.com/problems/number-of-ways-to-arrive-at-destination/"
+        },
+        {
+          "name": "Minimum steps to reach end from start by performing multiplication and mod operations with array elements",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/minimum-multiplications-to-reach-end/1",
+          "lc": ""
+        },
+        {
+          "name": "Bellman Ford Algorithm",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/distance-from-the-source-bellman-ford-algorithm/1",
+          "lc": ""
+        },
+        {
+          "name": "Floyd Warshal Algorithm",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/implementing-floyd-warshall2042/1",
+          "lc": ""
+        },
+        {
+          "name": "Find the city with the smallest number of neighbors in a threshold distance",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/0?category%5B%5D=Shortest%20Path&category%5B%5D=Shortest%20Path&page=1&query=category%5B%5DShortest%20Pathpage1category%5B%5DShortest%20Path",
+          "lc": "https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/"
+        }
+      ]
+    },
+    {
+      "title": "Step 5. Minimum Spanning Tree / Disjoint Set Problems",
+      "problems": [
+        {
+          "name": "Minimum Spanning Tree",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/minimum-spanning-tree/1",
+          "lc": ""
+        },
+        {
+          "name": "Prim\u2019s Algorithm",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/minimum-spanning-tree/1",
+          "lc": ""
+        },
+        {
+          "name": "Disjoint Set [Union by Rank]",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/disjoint-set-union-find/1",
+          "lc": ""
+        },
+        {
+          "name": "Disjoint Set [Union by Size]",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/disjoint-set-union-find/1",
+          "lc": ""
+        },
+        {
+          "name": "Kruskal\u2019s Algorithm",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/minimum-spanning-tree/1",
+          "lc": ""
+        },
+        {
+          "name": "Number of operations to make network connected",
+          "cn": "",
+          "gfg": "",
+          "lc": "https://leetcode.com/problems/number-of-operations-to-make-network-connected/"
+        },
+        {
+          "name": "Most stones removed with same rows or columns",
+          "cn": "",
+          "gfg": "",
+          "lc": "https://leetcode.com/problems/most-stones-removed-with-same-row-or-column/"
+        },
+        {
+          "name": "Accounts merge",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/merging-details/1",
+          "lc": "https://leetcode.com/problems/accounts-merge/"
+        },
+        {
+          "name": "Number of island II",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/find-the-number-of-islands/1",
+          "lc": "https://leetcode.com/problems/number-of-islands-ii/"
+        },
+        {
+          "name": "Making a Large Island",
+          "cn": "",
+          "gfg": "",
+          "lc": "https://leetcode.com/problems/making-a-large-island/"
+        },
+        {
+          "name": "Swim in rising water",
+          "cn": "",
+          "gfg": "",
+          "lc": "https://leetcode.com/problems/swim-in-rising-water/"
+        }
+      ]
+    },
+    {
+      "title": "Step 6. Other Algorithms",
+      "problems": [
+        {
+          "name": "Bridges in Graph",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/bridge-edge-in-graph/1",
+          "lc": "https://leetcode.com/problems/critical-connections-in-a-network/discuss/382385/find-bridges-in-a-graph"
+        },
+        {
+          "name": "Articulation Point",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/articulation-point-1/1",
+          "lc": ""
+        },
+        {
+          "name": "Kosaraju\u2019s Algorithm",
+          "cn": "",
+          "gfg": "https://practice.geeksforgeeks.org/problems/strongly-connected-components-kosarajus-algo/1",
+          "lc": ""
+        }
+      ]
+    }
+  ],
+  "dp": [
+    {
+      "title": "Step 1. Introduction to DP",
+      "problems": [
+        {
+          "name": "Dynamic Programming Introduction",
+          "cn": "https://takeuforward.org/data-structure/dynamic-programming-introduction/",
+          "gfg": "https://youtu.be/tyB0ztf0DNY",
+          "lc": ""
+        }
+      ]
+    },
+    {
+      "title": "Step 2. 1D DP",
+      "problems": [
+        {
+          "name": "Climbing Stars",
+          "cn": "https://takeuforward.org/data-structure/dynamic-programming-climbing-stairs/",
+          "gfg": "https://youtu.be/mLfjzJsN8us",
+          "lc": "https://practice.geeksforgeeks.org/problems/count-ways-to-reach-the-nth-stair-1587115620/1"
+        },
+        {
+          "name": "Frog Jump(DP-3)",
+          "cn": "https://takeuforward.org/data-structure/dynamic-programming-frog-jump-dp-3/",
+          "gfg": "https://www.youtube.com/watch?v=EgG3jsGoPvQ",
+          "lc": ""
+        },
+        {
+          "name": "Frog Jump with k distances(DP-4)",
+          "cn": "https://takeuforward.org/data-structure/dynamic-programming-frog-jump-with-k-distances-dp-4/",
+          "gfg": "https://www.youtube.com/watch?v=Kmh3rhyEtB8",
+          "lc": ""
+        },
+        {
+          "name": "Maximum sum of non-adjacent elements (DP 5)",
+          "cn": "https://takeuforward.org/data-structure/maximum-sum-of-non-adjacent-elements-dp-5/",
+          "gfg": "https://www.youtube.com/watch?v=GrMBfJNk_NY",
+          "lc": "https://practice.geeksforgeeks.org/problems/max-sum-without-adjacents2430/1"
+        },
+        {
+          "name": "House Robber (DP 6)",
+          "cn": "https://takeuforward.org/data-structure/dynamic-programming-house-robber-dp-6/",
+          "gfg": "https://www.youtube.com/watch?v=3WaxQMELSkw",
+          "lc": "https://practice.geeksforgeeks.org/problems/stickler-theif-1587115621/1"
+        }
+      ]
+    },
+    {
+      "title": "Step 3. 2D /3D DP and DP on Grids",
+      "problems": [
+        {
+          "name": "Ninja\u2019s Training (DP 7)",
+          "cn": "https://takeuforward.org/data-structure/dynamic-programming-ninjas-training-dp-7/",
+          "gfg": "https://www.youtube.com/watch?v=AE39gJYuRog",
+          "lc": ""
+        },
+        {
+          "name": "Grid Unique Paths : DP on Grids (DP8)",
+          "cn": "https://takeuforward.org/data-structure/grid-unique-paths-dp-on-grids-dp8/",
+          "gfg": "https://www.youtube.com/watch?v=sdE0A2Oxofw",
+          "lc": "https://practice.geeksforgeeks.org/problems/number-of-unique-paths5339/1"
+        },
+        {
+          "name": "Grid Unique Paths 2 (DP 9)",
+          "cn": "https://takeuforward.org/data-structure/grid-unique-paths-2-dp-9/",
+          "gfg": "https://www.youtube.com/watch?v=TmhpgXScLyY",
+          "lc": ""
+        },
+        {
+          "name": "Minimum path sum in Grid (DP 10)",
+          "cn": "https://takeuforward.org/data-structure/minimum-path-sum-in-a-grid-dp-10/",
+          "gfg": "https://www.youtube.com/watch?v=_rgTlyky1uQ",
+          "lc": "https://practice.geeksforgeeks.org/problems/minimum-cost-path3833/1"
+        },
+        {
+          "name": "Minimum path sum in Triangular Grid (DP 11)",
+          "cn": "https://takeuforward.org/data-structure/minimum-path-sum-in-triangular-grid-dp-11/",
+          "gfg": "https://www.youtube.com/watch?v=SrP-PiLSYC0",
+          "lc": ""
+        },
+        {
+          "name": "Minimum/Maximum Falling Path Sum (DP-12)",
+          "cn": "https://takeuforward.org/data-structure/minimum-maximum-falling-path-sum-dp-12/",
+          "gfg": "https://www.youtube.com/watch?v=N_aJ5qQbYA0",
+          "lc": "https://practice.geeksforgeeks.org/problems/path-in-matrix3805/1"
+        },
+        {
+          "name": "3D DP : Ninja and his friends (DP-13)",
+          "cn": "https://takeuforward.org/data-structure/3-d-dp-ninja-and-his-friends-dp-13/",
+          "gfg": "https://www.youtube.com/watch?v=QGfn7JeXK54",
+          "lc": ""
+        }
+      ]
+    },
+    {
+      "title": "Step 4. DP on Subsequence",
+      "problems": [
+        {
+          "name": "Subset sum equal to target (DP- 14)",
+          "cn": "https://takeuforward.org/data-structure/subset-sum-equal-to-target-dp-14/",
+          "gfg": "https://www.youtube.com/watch?v=fWX9xDmIzRI",
+          "lc": "https://practice.geeksforgeeks.org/problems/subset-sum-problem-1611555638/1"
+        },
+        {
+          "name": "Partition Equal Subset Sum (DP- 15)",
+          "cn": "https://takeuforward.org/data-structure/partition-equal-subset-sum-dp-15/",
+          "gfg": "https://www.youtube.com/watch?v=7win3dcgo3k",
+          "lc": "https://practice.geeksforgeeks.org/problems/subset-sum-problem2014/1"
+        },
+        {
+          "name": "Partition Set Into 2 Subsets With Min Absolute Sum Diff (DP- 16)",
+          "cn": "https://takeuforward.org/data-structure/partition-set-into-2-subsets-with-min-absolute-sum-diff-dp-16/",
+          "gfg": "https://www.youtube.com/watch?v=GS_OqZb2CWc",
+          "lc": "https://practice.geeksforgeeks.org/problems/minimum-sum-partition3317/1"
+        },
+        {
+          "name": "Count Subsets with Sum K (DP \u2013 17)",
+          "cn": "https://takeuforward.org/data-structure/count-subsets-with-sum-k-dp-17/",
+          "gfg": "https://www.youtube.com/watch?v=ZHyb-A2Mte4",
+          "lc": "https://practice.geeksforgeeks.org/problems/perfect-sum-problem5633/1"
+        },
+        {
+          "name": "Count Partitions with Given Difference (DP \u2013 18)",
+          "cn": "https://takeuforward.org/data-structure/count-partitions-with-given-difference-dp-18/",
+          "gfg": "https://www.youtube.com/watch?v=zoilQD1kYSg",
+          "lc": ""
+        },
+        {
+          "name": "0/1 Knapsack (DP \u2013 19)",
+          "cn": "https://takeuforward.org/data-structure/0-1-knapsack-dp-19/",
+          "gfg": "https://www.youtube.com/watch?v=GqOmJHQZivw",
+          "lc": "https://practice.geeksforgeeks.org/problems/0-1-knapsack-problem0945/1"
+        },
+        {
+          "name": "Minimum Coins (DP \u2013 20)",
+          "cn": "https://takeuforward.org/data-structure/minimum-coins-dp-20/",
+          "gfg": "https://www.youtube.com/watch?v=myPeWb3Y68A",
+          "lc": "https://practice.geeksforgeeks.org/problems/-minimum-number-of-coins4426/1"
+        },
+        {
+          "name": "Target Sum (DP \u2013 21)",
+          "cn": "https://takeuforward.org/data-structure/target-sum-dp-21/",
+          "gfg": "https://www.youtube.com/watch?v=b3GD8263-PQ",
+          "lc": "https://practice.geeksforgeeks.org/problems/target-sum-1626326450/1"
+        },
+        {
+          "name": "Coin Change 2 (DP \u2013 22)",
+          "cn": "https://takeuforward.org/data-structure/target-sum-dp-21/",
+          "gfg": "https://www.youtube.com/watch?v=HgyouUi11zk",
+          "lc": "https://practice.geeksforgeeks.org/problems/coin-change2448/1"
+        },
+        {
+          "name": "Unbounded Knapsack (DP \u2013 23)",
+          "cn": "https://takeuforward.org/data-structure/unbounded-knapsack-dp-23/",
+          "gfg": "https://youtu.be/OgvOZ6OrJoY",
+          "lc": "https://practice.geeksforgeeks.org/problems/knapsack-with-duplicate-items4201/1"
+        },
+        {
+          "name": "Rod Cutting Problem | (DP \u2013 24)",
+          "cn": "https://takeuforward.org/data-structure/rod-cutting-problem-dp-24/",
+          "gfg": "https://youtu.be/mO8XpGoJwuo",
+          "lc": "https://practice.geeksforgeeks.org/problems/rod-cutting0840/1"
+        }
+      ]
+    },
+    {
+      "title": "Step 5. DP on Strings",
+      "problems": [
+        {
+          "name": "Longest Common Subsequence | (DP \u2013 25)",
+          "cn": "https://takeuforward.org/data-structure/longest-common-subsequence-dp-25/",
+          "gfg": "https://youtu.be/NPZn9jBrX8U",
+          "lc": "https://practice.geeksforgeeks.org/problems/longest-common-subsequence-1587115620/1"
+        },
+        {
+          "name": "Print Longest Common Subsequence | (DP \u2013 26)",
+          "cn": "https://takeuforward.org/data-structure/print-longest-common-subsequence-dp-26/",
+          "gfg": "https://youtu.be/-zI4mrF2Pb4",
+          "lc": "https://practice.geeksforgeeks.org/problems/print-all-lcs-sequences3413/1"
+        },
+        {
+          "name": "Longest Common Substring | (DP \u2013 27)",
+          "cn": "https://takeuforward.org/data-structure/longest-common-substring-dp-27/",
+          "gfg": "https://youtu.be/_wP9mWNPL5w",
+          "lc": "https://practice.geeksforgeeks.org/problems/longest-common-substring1452/1"
+        },
+        {
+          "name": "Longest Palindromic Subsequence | (DP-28)",
+          "cn": "https://takeuforward.org/data-structure/longest-palindromic-subsequence-dp-28/",
+          "gfg": "https://youtu.be/6i_T5kkfv4A",
+          "lc": "https://practice.geeksforgeeks.org/problems/longest-palindromic-subsequence-1612327878/1"
+        },
+        {
+          "name": "Minimum insertions to make string palindrome | DP-29",
+          "cn": "https://takeuforward.org/data-structure/minimum-insertions-to-make-string-palindrome-dp-29/",
+          "gfg": "https://www.youtube.com/watch?v=xPBLEj41rFU",
+          "lc": "https://practice.geeksforgeeks.org/problems/form-a-palindrome1455/1"
+        },
+        {
+          "name": "Minimum Insertions/Deletions to Convert String | (DP- 30)",
+          "cn": "https://takeuforward.org/data-structure/minimum-insertions-deletions-to-convert-string-dp-30/",
+          "gfg": "https://www.youtube.com/watch?v=yMnH0jrir0Q",
+          "lc": "https://practice.geeksforgeeks.org/problems/minimum-number-of-deletions-and-insertions0209/1"
+        },
+        {
+          "name": "Shortest Common Supersequence | (DP \u2013 31)",
+          "cn": "https://takeuforward.org/data-structure/shortest-common-supersequence-dp-31/",
+          "gfg": "https://youtu.be/xElxAuBcvsU",
+          "lc": "https://practice.geeksforgeeks.org/problems/shortest-common-supersequence0322/1"
+        },
+        {
+          "name": "Distinct Subsequences| (DP-32)",
+          "cn": "https://takeuforward.org/data-structure/distinct-subsequences-dp-32/",
+          "gfg": "https://youtu.be/nVG7eTiD2bY",
+          "lc": "https://practice.geeksforgeeks.org/problems/number-of-distinct-subsequences0909/1"
+        },
+        {
+          "name": "Edit Distance | (DP-33)",
+          "cn": "https://takeuforward.org/data-structure/edit-distance-dp-33/",
+          "gfg": "https://youtu.be/fJaKO8FbDdo",
+          "lc": "https://practice.geeksforgeeks.org/problems/edit-distance3702/1"
+        },
+        {
+          "name": "Wildcard Matching | (DP-34)",
+          "cn": "https://takeuforward.org/data-structure/wildcard-matching-dp-34/",
+          "gfg": "https://youtu.be/ZmlQ3vgAOMo",
+          "lc": "https://practice.geeksforgeeks.org/problems/wildcard-pattern-matching/1"
+        }
+      ]
+    },
+    {
+      "title": "Step 6. DP on Stocks",
+      "problems": [
+        {
+          "name": "Best Time to Buy and Sell Stock |(DP-35)",
+          "cn": "https://takeuforward.org/data-structure/stock-buy-and-sell-dp-35/",
+          "gfg": "https://youtu.be/excAOvwF_Wk",
+          "lc": "https://practice.geeksforgeeks.org/problems/stock-buy-and-sell-1587115621/1"
+        },
+        {
+          "name": "Buy and Sell Stock \u2013 II|(DP-36)",
+          "cn": "https://takeuforward.org/data-structure/buy-and-sell-stock-ii-dp-36/",
+          "gfg": "https://youtu.be/nGJmxkUJQGs",
+          "lc": ""
+        },
+        {
+          "name": "Buy and Sell Stocks III|(DP-37)",
+          "cn": "https://takeuforward.org/data-structure/buy-and-sell-stock-iii-dp-37/",
+          "gfg": "https://youtu.be/-uQGzhYj8BQ",
+          "lc": "https://practice.geeksforgeeks.org/problems/buy-and-sell-a-share-at-most-twice/1"
+        },
+        {
+          "name": "Buy and Stock Sell IV |(DP-38)",
+          "cn": "https://takeuforward.org/data-structure/buy-and-sell-stock-iv-dp-38/",
+          "gfg": "https://youtu.be/IV1dHbk5CDc",
+          "lc": "https://practice.geeksforgeeks.org/problems/maximum-profit4657/1"
+        },
+        {
+          "name": "Buy and Sell Stocks With Cooldown|(DP-39)",
+          "cn": "https://takeuforward.org/data-structure/buy-and-sell-stocks-with-cooldown-dp-39/",
+          "gfg": "https://youtu.be/IGIe46xw3YY",
+          "lc": ""
+        },
+        {
+          "name": "Buy and Sell Stocks With Transaction Fee|(DP-40)",
+          "cn": "https://takeuforward.org/data-structure/buy-and-sell-stocks-with-transaction-fees-dp-40/",
+          "gfg": "https://youtu.be/k4eK-vEmnKg",
+          "lc": ""
+        }
+      ]
+    },
+    {
+      "title": "Step 7. DP on LIS",
+      "problems": [
+        {
+          "name": "Longest Increasing Subsequence |(DP-41)",
+          "cn": "https://takeuforward.org/data-structure/longest-increasing-subsequence-dp-41/",
+          "gfg": "https://youtu.be/ekcwMsSIzVc",
+          "lc": "https://practice.geeksforgeeks.org/problems/longest-increasing-subsequence-1587115620/1"
+        },
+        {
+          "name": "Printing Longest Increasing Subsequence|(DP-42)",
+          "cn": "https://takeuforward.org/data-structure/printing-longest-increasing-subsequence-dp-42/",
+          "gfg": "https://youtu.be/IFfYfonAFGc",
+          "lc": ""
+        },
+        {
+          "name": "Longest Increasing Subsequence |(DP-43)",
+          "cn": "https://takeuforward.org/data-structure/longest-increasing-subsequence-binary-search-dp-43/",
+          "gfg": "https://youtu.be/on2hvxBXJH4",
+          "lc": "https://practice.geeksforgeeks.org/problems/longest-increasing-subsequence-1587115620/1"
+        },
+        {
+          "name": "Largest Divisible Subset|(DP-44)",
+          "cn": "https://takeuforward.org/data-structure/longest-divisible-subset-dp-44/",
+          "gfg": "https://youtu.be/gDuZwBW9VvM",
+          "lc": ""
+        },
+        {
+          "name": "Longest String Chain|(DP-45)",
+          "cn": "https://takeuforward.org/data-structure/longest-string-chain-dp-45/",
+          "gfg": "https://youtu.be/YY8iBaYcc4g",
+          "lc": ""
+        },
+        {
+          "name": "Longest Bitonic Subsequence |(DP-46)",
+          "cn": "https://takeuforward.org/dynamic-programming/striver-dp-series-dynamic-programming-problems/#",
+          "gfg": "https://youtu.be/y4vN0WNdrlg",
+          "lc": "https://practice.geeksforgeeks.org/problems/longest-bitonic-subsequence0824/1"
+        },
+        {
+          "name": "Number of Longest Increasing Subsequences|(DP-47)",
+          "cn": "https://takeuforward.org/dynamic-programming/striver-dp-series-dynamic-programming-problems/#",
+          "gfg": "https://youtu.be/cKVl1TFdNXg",
+          "lc": ""
+        }
+      ]
+    },
+    {
+      "title": "Step 8. MCM DP | Partition DP",
+      "problems": [
+        {
+          "name": "Matrix Chain Multiplication|(DP-48)",
+          "cn": "https://takeuforward.org/dynamic-programming/striver-dp-series-dynamic-programming-problems/#",
+          "gfg": "https://youtu.be/vRVfmbCFW7Y",
+          "lc": "https://practice.geeksforgeeks.org/problems/matrix-chain-multiplication0303/1"
+        },
+        {
+          "name": "Matrix Chain Multiplication | Bottom-Up|(DP-49)",
+          "cn": "https://takeuforward.org/dynamic-programming/striver-dp-series-dynamic-programming-problems/#",
+          "gfg": "https://youtu.be/pDCXsbAw5Cg",
+          "lc": "https://practice.geeksforgeeks.org/problems/matrix-chain-multiplication0303/1"
+        },
+        {
+          "name": "Minimum Cost to Cut the Stick|(DP-50)",
+          "cn": "https://takeuforward.org/dynamic-programming/striver-dp-series-dynamic-programming-problems/#",
+          "gfg": "https://youtu.be/xwomavsC86c",
+          "lc": "https://practice.geeksforgeeks.org/problems/rod-cutting0840/1"
+        },
+        {
+          "name": "Burst Balloons|(DP-51)",
+          "cn": "https://takeuforward.org/dynamic-programming/striver-dp-series-dynamic-programming-problems/#",
+          "gfg": "https://youtu.be/Yz4LlDSlkns",
+          "lc": "https://practice.geeksforgeeks.org/batch-problems/maximum-triple-product/1/"
+        },
+        {
+          "name": "Evaluate Boolean Expression to True|(DP-52)",
+          "cn": "https://takeuforward.org/dynamic-programming/striver-dp-series-dynamic-programming-problems/#",
+          "gfg": "https://youtu.be/MM7fXopgyjw",
+          "lc": "https://practice.geeksforgeeks.org/problems/boolean-parenthesization5610/1"
+        },
+        {
+          "name": "Palindrome Partitioning \u2013 II|(DP-53)",
+          "cn": "https://takeuforward.org/dynamic-programming/striver-dp-series-dynamic-programming-problems/#",
+          "gfg": "https://youtu.be/_H8V5hJUGd0",
+          "lc": "https://practice.geeksforgeeks.org/problems/palindromic-patitioning4845/1"
+        },
+        {
+          "name": "Partition Array for Maximum Sum|(DP-54)",
+          "cn": "https://takeuforward.org/dynamic-programming/striver-dp-series-dynamic-programming-problems/#",
+          "gfg": "https://youtu.be/PhWWJmaKfMc",
+          "lc": ""
+        }
+      ]
+    },
+    {
+      "title": "Step 9. DP on Squares",
+      "problems": [
+        {
+          "name": "Maximum Rectangle Area with all 1\u2019s|(DP-55)",
+          "cn": "https://takeuforward.org/dynamic-programming/striver-dp-series-dynamic-programming-problems/#",
+          "gfg": "https://youtu.be/tOylVCugy9k",
+          "lc": "https://practice.geeksforgeeks.org/problems/max-rectangle/1"
+        },
+        {
+          "name": "Count Square Submatrices with All Ones|(DP-56)",
+          "cn": "https://takeuforward.org/dynamic-programming/striver-dp-series-dynamic-programming-problems/#",
+          "gfg": "https://youtu.be/auS1fynpnjo",
+          "lc": ""
+        }
+      ]
+    }
+  ]
+}

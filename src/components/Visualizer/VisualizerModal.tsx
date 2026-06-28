@@ -190,9 +190,9 @@ export default function VisualizerModal({ problem, onClose }: VisualizerModalPro
     const type = meta.visualizerType;
     if (type === "array1d") return <Array1DVisualizer step={step} />;
     if (type === "matrix2d") return <SpiralMatrixVisualizer step={step} />;
-    if (type === "linkedlist") return <LinkedListVisualizer step={step} />;
+    if (type === "linkedlist") return <LinkedListVisualizer step={step} problem={problem} />;
     if (type === "stringmap") return <AnagramVisualizer step={step} pid={pid} />;
-    if (type === "recursion") return <RecursionTreeVisualizer step={step} />;
+    if (type === "recursion") return <RecursionTreeVisualizer step={step} problem={problem} />;
     
     return <div className="text-center font-bold uppercase text-red-500">Visualizer Component not found</div>;
   };

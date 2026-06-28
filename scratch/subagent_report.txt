@@ -1,0 +1,1162 @@
+Created At: 2026-06-28T10:54:24Z
+Completed At: 2026-06-28T11:00:17Z
+Browser subagent result:
+I have completed the task successfully. The previous scrape run had bugs in identifying and classifying platform links due to simple index-based matching, which caused video links (YouTube) and non-matching platform links to get mixed up. I solved this by using a robust domain-based classification script that targets only the anchor (`<a>`) tags inside the platforms container (`div.css-ke21r5`) and correctly identifies `lc` (Leetcode), `gfg` (GeeksforGeeks), and `cn` (Coding Ninjas) links. 
+
+### Observations
+1. **Coding Ninjas (`cn`) links**: These are indeed present in the tracker (for example, in `/binary_tree` under `"Minimum time taken to BURN the Binary Tree from a Node"` pointing to `https://www.codingninjas.com/...`).
+2. **`sliding_window` path**: There is no router path named `/sliding_window` in the web application (it serves a blank 404 page). In this tracker site, all sliding window problems (e.g., "Longest Substring Without Repeating Characters", "Max Consecutive Ones III", etc.) are mapped under `/two_pointers` (Step 7. Two Pointers & Sliding Window). We have kept `/sliding_window` empty to match the exact router behavior of the site.
+
+---
+
+### Python Scraping Script
+Below is a clean Python automation script using **Playwright** that crawls the tracker site and generates the structured JSON exactly as done during our browser session.
+
+```python
+import json
+from playwright.sync_api import sync_playwright
+
+BASE_URL = "https://a2zdsa.pages.dev"
+PATHS = [
+    "bit_manipulation",
+    "stack_n_queue",
+    "two_pointers",
+    "heaps",
+    "sliding_window",
+    "binary_tree",
+    "binary_search_tree",
+    "graphs",
+    "tries",
+    "dp"
+]
+
+def scrape_tracker():
+    results = {}
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        
+        for path in PATHS:
+            url = f"{BASE_URL}/{path}"
+            print(f"Navigating to: {url}...")
+            page.goto(url)
+            page.wait_for_timeout(2000) # wait for render
+            
+            # Extract categories and problems
+            data = page.evaluate('''() => {
+                const categories = Array.from(document.querySelectorAll('.singleCategory'));
+                return categories.map(cat => {
+                    const titleEl = cat.querySelector('.css-1wnm7qn');
+                    const title = titleEl ? titleEl.innerText.replace(/\\n+/g, ' ').trim() : 'No Title';
+                    const problemsContainer = cat.children[1];
+                    if (!problemsContainer) return { title, problems: [] };
+                    const problemEls = Array.from(problemsContainer.children);
+                    return {
+                        title,
+                        problems: problemEls.map(probEl => {
+                            const nameEl = probEl.querySelector('p');
+                            const name = nameEl ? nameEl.innerText.trim() : 'Unknown';
+                            
+                            let cn = '';
+                            let gfg = '';
+                            let lc = '';
+                            
+                            // Target third child (platforms container)
+                            const linksDiv = probEl.children[2];
+                            if (linksDiv) {
+                                const links = Array.from(linksDiv.querySelectorAll('a'));
+                                links.forEach(link => {
+                                    const href = link.href;
+                                    if (!href) return;
+                                    if (href.includes('leetcode.com')) {
+                                        lc = href;
+                                    } else if (href.includes('geeksforgeeks.org')) {
+                                        gfg = href;
+                                    } else if (href.includes('codingninjas.com') || href.includes('codestudio.com')) {
+                                        cn = href;
+                                    }
+                                });
+                            }
+                            
+                            return { name, cn, gfg, lc };
+                        })
+                    };
+                });
+            }''')
+            
+            # Map categories to problems for this page
+            page_data = {}
+            for item in data:
+                page_data[item['title']] = item['problems']
+            
+            results[path] = page_data
+            
+        browser.close()
+        
+    # Write to output file
+    with open("output.json", "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2, ensure_ascii=False)
+    print("Scraping completed! Results saved to output.json.")
+
+if __name__ == "__main__":
+    scrape_tracker()
+```
+
+---
+
+### Extracted JSON Data Representation
+Here is a snippet of the JSON representation mapping categories to problems under each path:
+
+```json
+{
+  "bit_manipulation": {
+    "Step 1. Learn Bit Manipulation": [
+      {
+        "name": "Introduction to Bit Manipulation [Theory]",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Check if the i-th bit is set or not",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/check-whether-k-th-bit-is-set-or-not-1587115620/1",
+        "lc": ""
+      },
+      {
+        "name": "Check if a number is odd or not",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/odd-or-even3618/1",
+        "lc": ""
+      },
+      {
+        "name": "Check if a number is power of 2 or not",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/power-of-2-1587115620/1",
+        "lc": "https://leetcode.com/problems/power-of-two/"
+      },
+      {
+        "name": "Count the number of set bits",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/count-total-set-bits-1587115620/1",
+        "lc": ""
+      },
+      {
+        "name": "Set/Unset the rightmost unset bit",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/set-the-rightmost-unset-bit4436/1",
+        "lc": ""
+      },
+      {
+        "name": "Swap two numbers",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/swap-two-numbers3844/1",
+        "lc": ""
+      },
+      {
+        "name": "Divide two integers without using multiplication, division and mod operator",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/division-without-using-multiplication-division-and-mod-operator/0",
+        "lc": "https://leetcode.com/problems/divide-two-integers/"
+      }
+    ],
+    "Step 2. Interview Problems": [
+      {
+        "name": "Count number of bits to be flipped to convert A to B",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/bit-difference-1587115620/1",
+        "lc": "https://leetcode.com/problems/minimum-bit-flips-to-convert-number/"
+      },
+      {
+        "name": "Find the number that appears odd number of times",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/find-the-odd-occurence4820/1",
+        "lc": "https://leetcode.com/problems/single-number/"
+      },
+      {
+        "name": "Power Set",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/power-set4302/1",
+        "lc": "https://leetcode.com/problems/subsets/"
+      },
+      {
+        "name": "Find xor of numbers from L to R",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Find the two numbers appearing odd number of times",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/two-numbers-with-odd-occurrences5846/1",
+        "lc": ""
+      }
+    ],
+    "Step 3. Advanced Maths": [
+      {
+        "name": "Print Prime Factors of a Number",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/prime-factors5052/1",
+        "lc": ""
+      },
+      {
+        "name": "All Divisors of a Number",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Sieve of Eratosthenes",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/sieve-of-eratosthenes5242/1",
+        "lc": "https://leetcode.com/problems/count-primes/"
+      },
+      {
+        "name": "Find Prime Factorisation of a Number using Sieve",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Power(n, x)",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/power-of-numbers-1587115620/1",
+        "lc": "https://leetcode.com/problems/powx-n/"
+      }
+    ]
+  },
+  "stack_n_queue": {
+    "Step 1. Learning": [
+      {
+        "name": "Implement Stack using Arrays",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/implement-stack-using-array/1",
+        "lc": ""
+      },
+      {
+        "name": "Implement Queue using Arrays",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/implement-queue-using-array/1",
+        "lc": ""
+      },
+      {
+        "name": "Implement Stack using Queue",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/stack-using-two-queues/1",
+        "lc": "https://leetcode.com/problems/implement-stack-using-queues/"
+      },
+      {
+        "name": "Implement Queue using Stack",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/queue-using-stack/1",
+        "lc": "https://leetcode.com/problems/implement-queue-using-stacks/"
+      },
+      {
+        "name": "Implement stack using Linkedlist",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/implement-stack-using-linked-list/1",
+        "lc": ""
+      },
+      {
+        "name": "Implement queue using Linkedlist",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/implement-queue-using-linked-list/1",
+        "lc": ""
+      },
+      {
+        "name": "Check for balanced paranthesis",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/parenthesis-checker2744/1",
+        "lc": "https://leetcode.com/problems/valid-parentheses/"
+      },
+      {
+        "name": "Implement Min Stack",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/get-minimum-element-from-stack/1",
+        "lc": "https://leetcode.com/problems/min-stack/"
+      }
+    ],
+    "Step 2. Prefix, Infix, Postfix Conversion Problems": [
+      {
+        "name": "Infix to Postfix Conversion using Stack",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/infix-to-postfix-1587115620/1",
+        "lc": ""
+      },
+      {
+        "name": "Prefix to Infix Conversion",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Prefix to Postfix Conversion",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Postfix to Prefix Conversion",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Postfix to Infix",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Convert Infix To Prefix Notation",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/infix-to-postfix-1587115620/1",
+        "lc": ""
+      }
+    ],
+    "Step 3. Monotonic Stack /Queue Problem [Imp]": [
+      {
+        "name": "Next Greater Element",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/next-larger-element-1587115620/1",
+        "lc": "https://leetcode.com/problems/next-greater-element-i/"
+      },
+      {
+        "name": "Next Greater Element - II",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/next-greater-element-ii/"
+      },
+      {
+        "name": "Next Smaller Element",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/immediate-smaller-element1142/1",
+        "lc": ""
+      },
+      {
+        "name": "Number of NGEs to the right",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Trapping Rainwater",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/trapping-rain-water-1587115621/1",
+        "lc": "https://leetcode.com/problems/trapping-rain-water/"
+      },
+      {
+        "name": "Sum of subarray minimum",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/sum-of-subarray-minimums/"
+      },
+      {
+        "name": "Stock span problem",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/stock-span-problem-1587115621/1",
+        "lc": "https://leetcode.com/problems/online-stock-span/"
+      },
+      {
+        "name": "Asteroid Collision",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/asteroid-collision/"
+      },
+      {
+        "name": "Sum of subarray ranges",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/sum-of-subarray-ranges/"
+      },
+      {
+        "name": "Remove k Digits",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/remove-k-digits/1",
+        "lc": "https://leetcode.com/problems/remove-k-digits/"
+      },
+      {
+        "name": "Largest rectangle in a histogram",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/maximum-rectangular-area-in-a-histogram-1587115620/1",
+        "lc": "https://leetcode.com/problems/largest-rectangle-in-histogram/"
+      },
+      {
+        "name": "Maximal Rectangles",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/max-rectangle/1",
+        "lc": "https://leetcode.com/problems/maximal-rectangle/"
+      }
+    ],
+    "Step 4. Implementation Problems": [
+      {
+        "name": "Sliding Window maximum",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/maximum-of-all-subarrays-of-size-k3101/1",
+        "lc": "https://leetcode.com/problems/sliding-window-maximum/"
+      },
+      {
+        "name": "Stock Span Problem",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/stock-span-problem-1587115621/1",
+        "lc": "https://leetcode.com/problems/online-stock-span/"
+      },
+      {
+        "name": "The Celebrity Problem",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/the-celebrity-problem/1",
+        "lc": "https://leetcode.com/accounts/login/?next=/problems/find-the-celebrity/"
+      },
+      {
+        "name": "Rotten Oranges",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/rotten-oranges2536/1",
+        "lc": "https://leetcode.com/problems/rotting-oranges/"
+      },
+      {
+        "name": "LRU cache (IMPORTANT)",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/lru-cache/1",
+        "lc": "https://leetcode.com/problems/lru-cache/"
+      },
+      {
+        "name": "LFU cache",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/lfu-cache/"
+      }
+    ]
+  },
+  "two_pointers": {
+    "Step 1. Medium Problems": [
+      {
+        "name": "Longest Substring Without Repeating Characters",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/length-of-the-longest-substring3036/1",
+        "lc": "https://leetcode.com/problems/longest-substring-without-repeating-characters/"
+      },
+      {
+        "name": "Max Consecutive Ones III",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/maximum-consecutive-ones/1",
+        "lc": "https://leetcode.com/problems/max-consecutive-ones-iii/"
+      },
+      {
+        "name": "Fruit Into Baskets",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Longest repeating character replacement",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/longest-repeating-character-replacement/"
+      },
+      {
+        "name": "Binary subarray with sum",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/binary-subarrays-with-sum/"
+      },
+      {
+        "name": "Count number of nice subarrays",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/count-subarray-with-k-odds/1",
+        "lc": "https://leetcode.com/problems/count-number-of-nice-subarrays/"
+      },
+      {
+        "name": "Number of substring containing all three characters",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/count-substring/1",
+        "lc": "https://leetcode.com/problems/number-of-substrings-containing-all-three-characters/"
+      },
+      {
+        "name": "Maximum point you can obtain from cards",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards/"
+      }
+    ],
+    "Step 2. Hard Problems": [
+      {
+        "name": "Longest Substring with At Most K Distinct Characters",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/longest-k-unique-characters-substring0853/1",
+        "lc": "https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/"
+      },
+      {
+        "name": "Subarray with k different integers",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/subarrays-with-k-different-integers/"
+      },
+      {
+        "name": "Minimum Window Substring",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/smallest-window-in-a-string-containing-all-the-characters-of-another-string-1587115621/1",
+        "lc": "https://leetcode.com/problems/minimum-window-substring/"
+      },
+      {
+        "name": "Minimum Window Subsequence",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/minimum-window-subsequence/"
+      }
+    ]
+  },
+  "heaps": {
+    "Step 1. Learning": [
+      {
+        "name": "Introduction to Priority Queues using Binary Heaps",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Min Heap and Max Heap Implementation",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/operations-on-binary-min-heap/1",
+        "lc": ""
+      },
+      {
+        "name": "Check if an array represents a min-heap or not",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/does-array-represent-heap4345/1",
+        "lc": ""
+      },
+      {
+        "name": "Convert min Heap to max Heap",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      }
+    ],
+    "Step 2.Programming Medium Problems": [
+      {
+        "name": "Kth largest element in an array [use priority queue]",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/k-largest-elements3736/1",
+        "lc": "https://leetcode.com/problems/kth-largest-element-in-an-array/"
+      },
+      {
+        "name": "Kth smallest element in an array [use priority queue]",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/kth-smallest-element5635/1",
+        "lc": ""
+      },
+      {
+        "name": "Sort K sorted array",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/merge-k-sorted-arrays/1",
+        "lc": ""
+      },
+      {
+        "name": "Merge M sorted Lists",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/merge-k-sorted-linked-lists/1",
+        "lc": "https://leetcode.com/problems/merge-k-sorted-lists/"
+      },
+      {
+        "name": "Replace each array element by its corresponding rank",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Task Scheduler",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/task-scheduler/"
+      },
+      {
+        "name": "Hands of Straights",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/hand-of-straights/"
+      }
+    ],
+    "Step 3. Hard Problems": [
+      {
+        "name": "Design twitter",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/design-twitter/"
+      },
+      {
+        "name": "Connect `n` ropes with minimal cost",
+        "cn": "",
+        "gfg": "https://www.geeksforgeeks.org/problems/minimum-cost-of-ropes-1587115620/1",
+        "lc": ""
+      },
+      {
+        "name": "Kth largest element in a stream of running integers",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/kth-largest-element-in-a-stream2220/1",
+        "lc": "https://leetcode.com/problems/kth-largest-element-in-a-stream/#:~:text=Implement%20KthLargest%20class%3A,largest%20element%20in%20the%20stream."
+      },
+      {
+        "name": "Maximum Sum Combination",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Find Median from Data Stream",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/find-median-in-a-stream-1587115620/1",
+        "lc": "https://leetcode.com/problems/find-median-from-data-stream/"
+      },
+      {
+        "name": "K most frequent elements",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/top-k-frequent-elements-in-array/1",
+        "lc": "https://leetcode.com/problems/top-k-frequent-elements/"
+      }
+    ]
+  },
+  "sliding_window": {},
+  "binary_tree": {
+    "Step 1. Traversals": [
+      {
+        "name": "Introduction to Trees",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Binary Tree Representation in C++",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Binary Tree Representation in Java",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Binary Tree Traversals in Binary Tree",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Preorder Traversal of Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/preorder-traversal/1",
+        "lc": "https://leetcode.com/problems/binary-tree-preorder-traversal/"
+      },
+      {
+        "name": "Inorder Traversal of Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/inorder-traversal/1",
+        "lc": "https://leetcode.com/problems/binary-tree-inorder-traversal/"
+      },
+      {
+        "name": "Post-order Traversal of Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/postorder-traversal/1",
+        "lc": "https://leetcode.com/problems/binary-tree-postorder-traversal/"
+      },
+      {
+        "name": "Level order Traversal / Level order traversal in spiral form",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/level-order-traversal-in-spiral-form/1",
+        "lc": "https://leetcode.com/problems/binary-tree-level-order-traversal/"
+      },
+      {
+        "name": "Iterative Preorder Traversal of Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/preorder-traversal/1",
+        "lc": "https://leetcode.com/problems/binary-tree-preorder-traversal/"
+      },
+      {
+        "name": "Iterative Inorder Traversal of Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/inorder-traversal/1",
+        "lc": "https://leetcode.com/problems/binary-tree-inorder-traversal/"
+      },
+      {
+        "name": "Post-order Traversal of Binary Tree using 2 stack",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/postorder-traversal/1",
+        "lc": "https://leetcode.com/problems/binary-tree-postorder-traversal/"
+      },
+      {
+        "name": "Post-order Traversal of Binary Tree using 1 stack",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/postorder-traversal/1",
+        "lc": "https://leetcode.com/problems/binary-tree-postorder-traversal/"
+      },
+      {
+        "name": "Preorder, Inorder, and Postorder Traversal in one Traversal",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/postorder-traversal-iterative/1",
+        "lc": ""
+      }
+    ],
+    "Step 2. Medium Problems": [
+      {
+        "name": "Height of a Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/height-of-binary-tree/1",
+        "lc": "https://leetcode.com/problems/maximum-depth-of-binary-tree/"
+      },
+      {
+        "name": "Check if the Binary tree is height-balanced or not",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/check-for-balanced-tree/1",
+        "lc": "https://leetcode.com/problems/balanced-binary-tree/"
+      },
+      {
+        "name": "Diameter of Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/diameter-of-binary-tree/1",
+        "lc": "https://leetcode.com/problems/diameter-of-binary-tree/"
+      },
+      {
+        "name": "Maximum path sum",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/maximum-path-sum-from-any-node/1",
+        "lc": "https://leetcode.com/problems/binary-tree-maximum-path-sum/"
+      },
+      {
+        "name": "Check if two trees are identical or not",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/determine-if-two-trees-are-identical/1",
+        "lc": "https://leetcode.com/problems/same-tree/"
+      },
+      {
+        "name": "Zig Zag Traversal of Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/zigzag-tree-traversal/1",
+        "lc": "https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/"
+      },
+      {
+        "name": "Boundary Traversal of Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/boundary-traversal-of-binary-tree/0",
+        "lc": "https://leetcode.com/problems/boundary-of-binary-tree/"
+      },
+      {
+        "name": "Vertical Order Traversal of Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/print-a-binary-tree-in-vertical-order/0",
+        "lc": "https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/"
+      },
+      {
+        "name": "Top View of Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/top-view-of-binary-tree/1",
+        "lc": ""
+      },
+      {
+        "name": "Bottom View of Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/bottom-view-of-binary-tree/1",
+        "lc": ""
+      },
+      {
+        "name": "Right/Left View of Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/left-view-of-binary-tree/1",
+        "lc": "https://leetcode.com/problems/binary-tree-right-side-view/"
+      },
+      {
+        "name": "Symmetric Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/symmetric-tree/1",
+        "lc": "https://leetcode.com/problems/symmetric-tree/"
+      }
+    ],
+    "Step 3. Hard Problems": [
+      {
+        "name": "Root to Node Path in Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/root-to-leaf-paths/1",
+        "lc": ""
+      },
+      {
+        "name": "LCA in Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/lowest-common-ancestor-in-a-binary-tree/1",
+        "lc": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/"
+      },
+      {
+        "name": "Maximum width of a Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/maximum-width-of-tree/1",
+        "lc": "https://leetcode.com/problems/maximum-width-of-binary-tree/"
+      },
+      {
+        "name": "Check for Children Sum Property",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/children-sum-parent/1",
+        "lc": ""
+      },
+      {
+        "name": "Print all the Nodes at a distance of K in a Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/nodes-at-given-distance-in-binary-tree/1",
+        "lc": "https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/"
+      },
+      {
+        "name": "Minimum time taken to BURN the Binary Tree from a Node",
+        "cn": "https://www.codingninjas.com/codestudio/problems/time-to-burn-tree_630563?source=youtube&campaign=Striver_Tree_Videos",
+        "gfg": "https://practice.geeksforgeeks.org/problems/burning-tree/1",
+        "lc": ""
+      },
+      {
+        "name": "Count total Nodes in a COMPLETE Binary Tree",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/count-complete-tree-nodes/"
+      },
+      {
+        "name": "Requirements needed to construct a Unique Binary Tree | Theory",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Construct Binary Tree from inorder and preorder",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/construct-tree-1/1",
+        "lc": "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/"
+      },
+      {
+        "name": "Construct the Binary Tree from Postorder and Inorder Traversal",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/tree-from-postorder-and-inorder/1",
+        "lc": "https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/"
+      },
+      {
+        "name": "Serialize and deserialize Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/serialize-and-deserialize-a-binary-tree/1",
+        "lc": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/"
+      },
+      {
+        "name": "Morris Preorder Traversal of a Binary Tree",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/binary-tree-inorder-traversal/"
+      },
+      {
+        "name": "Morris Inorder Traversal of a Binary Tree",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/binary-tree-inorder-traversal/"
+      },
+      {
+        "name": "Flatten Binary Tree to LinkedList",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/flatten-binary-tree-to-linked-list/1",
+        "lc": "https://leetcode.com/problems/flatten-binary-tree-to-linked-list/"
+      }
+    ]
+  },
+  "binary_search_tree": {
+    "Step 1. Concepts": [
+      {
+        "name": "Introduction to Binary Search Tree",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Search in a Binary Search Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/search-a-node-in-bst/1",
+        "lc": "https://leetcode.com/problems/search-in-a-binary-search-tree/"
+      },
+      {
+        "name": "Find Min/Max in BST",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/minimum-element-in-bst/1",
+        "lc": ""
+      }
+    ],
+    "Step 2. Practice Problems": [
+      {
+        "name": "Ceil in a Binary Search Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/implementing-ceil-in-bst/1",
+        "lc": ""
+      },
+      {
+        "name": "Floor in a Binary Search Tree",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Insert a given Node in Binary Search Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/insert-a-node-in-a-bst/1",
+        "lc": "https://leetcode.com/problems/insert-into-a-binary-search-tree/"
+      },
+      {
+        "name": "Delete a Node in Binary Search Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/delete-a-node-from-bst/1",
+        "lc": "https://leetcode.com/problems/delete-node-in-a-bst/"
+      },
+      {
+        "name": "Find K-th smallest/largest element in BST",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/find-k-th-smallest-element-in-bst/1#:~:text=Find%20the%20Kth%20Smallest%20element%20in%20the%20BST.&text=Your%20Task%3A,such%20element%20exists%20return%20%2D1.",
+        "lc": "https://leetcode.com/problems/kth-smallest-element-in-a-bst/"
+      },
+      {
+        "name": "Check if a tree is a BST or BT",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/check-for-bst/1",
+        "lc": "https://leetcode.com/problems/validate-binary-search-tree/"
+      },
+      {
+        "name": "LCA in Binary Search Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/lowest-common-ancestor-in-a-bst/1",
+        "lc": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/"
+      },
+      {
+        "name": "Construct a BST from a preorder traversal",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/preorder-to-postorder4423/1",
+        "lc": "https://leetcode.com/problems/construct-binary-search-tree-from-preorder-traversal/"
+      },
+      {
+        "name": "Inorder Successor/Predecessor in BST",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/predecessor-and-successor/1",
+        "lc": "https://leetcode.com/problems/inorder-successor-in-bst/"
+      },
+      {
+        "name": "Merge 2 BST’s",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/merge-two-bst-s/1",
+        "lc": "https://leetcode.com/problems/binary-search-tree-iterator/"
+      },
+      {
+        "name": "Two Sum In BST | Check if there exists a pair with Sum K",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/find-a-pair-with-given-target-in-bst/1",
+        "lc": "https://leetcode.com/problems/two-sum-iv-input-is-a-bst/"
+      },
+      {
+        "name": "Recover BST | Correct BST with two nodes swapped",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/reverse-array-in-groups0255/1",
+        "lc": "https://leetcode.com/problems/recover-binary-search-tree/"
+      },
+      {
+        "name": "Largest BST in Binary Tree",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/largest-bst/1",
+        "lc": ""
+      }
+    ]
+  },
+  "tries": {
+    "Step 1. Theory": [
+      {
+        "name": "Implement TRIE | INSERT | SEARCH | STARTSWITH",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/trie-insert-and-search0651/1",
+        "lc": "https://leetcode.com/problems/implement-trie-prefix-tree/"
+      }
+    ],
+    "Step 2. Problems": [
+      {
+        "name": "Implement Trie – 2 (Prefix Tree)",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/trie-delete/1",
+        "lc": ""
+      },
+      {
+        "name": "Longest String with All Prefixes",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/longest-common-prefix-in-an-array5129/1",
+        "lc": ""
+      },
+      {
+        "name": "Number of Distinct Substrings in a String",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/count-of-distinct-substrings/1",
+        "lc": ""
+      },
+      {
+        "name": "Bit PreRequisites for TRIE Problems",
+        "cn": "",
+        "gfg": "",
+        "lc": ""
+      },
+      {
+        "name": "Maximum XOR of two numbers in an array",
+        "cn": "",
+        "gfg": "https://practice.geeksforgeeks.org/problems/maximum-xor-of-two-numbers-in-an-array/0",
+        "lc": "https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/"
+      },
+      {
+        "name": "Maximum XOR With an Element From Array",
+        "cn": "",
+        "gfg": "",
+        "lc": "https://leetcode.com/problems/maximum-xor-with-an-element-from-array/"
+      }
+    ]
+  }
+}
+```
+
+## Detailed Browser Subagent Actions:
+
+### Step 2: view_file
+Arguments:
+```json
+{"AbsolutePath":"C:\\Users\\Priyanshu\\.gemini\\antigravity-ide\\brain\\f1aed70d-cf98-4add-a37a-5c5b538b4e9e\\browser\\scratchpad_80g8ywy8.md","explanation":"Read the scratchpad to see current progress and context.","toolAction":"Viewing scratchpad file","toolSummary":"File view"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 4: replace_file_content
+Arguments:
+```json
+{"AllowMultiple":false,"Description":"Initialize scratchpad with checklist and placeholder.","EndLine":1,"Instruction":"Initialize the scratchpad with checklist of pages to visit.","ReplacementContent":"# Task Progress\n\n## Checklist\n- [ ] bit_manipulation\n- [ ] stack_n_queue\n- [ ] two_pointers\n- [ ] heaps\n- [ ] greedy\n- [ ] binary_tree\n- [ ] binary_search_tree\n- [ ] graphs\n- [ ] dp\n- [ ] tries\n\n## Extracted Data\n```json\n{}\n```\n","StartLine":1,"TargetContent":"","TargetFile":"C:\\Users\\Priyanshu\\.gemini\\antigravity-ide\\brain\\f1aed70d-cf98-4add-a37a-5c5b538b4e9e\\browser\\scratchpad_80g8ywy8.md","explanation":"Initialize the scratchpad.","toolAction":"Initializing scratchpad","toolSummary":"File edit"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 6: wait
+Arguments:
+```json
+{"duration_ms":3000,"explanation":"Wait for bit_manipulation page to be fully loaded.","toolAction":"Waiting for page load","toolSummary":"Wait"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 8: list_browser_pages
+Arguments:
+```json
+{"explanation":"Confirm open browser pages and retrieve page ID.","toolAction":"Listing browser pages","toolSummary":"Page listing"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 10: execute_browser_javascript
+Arguments:
+```json
+{"JavaScriptDescription":"Extract problems and links from the current page.","JavaScriptSource":"(() =\u003e {\n  const categories = Array.from(document.querySelectorAll('.singleCategory'));\n  return categories.map(cat =\u003e {\n    const titleEl = cat.querySelector('.css-1wnm7qn');\n    const title = titleEl ? titleEl.innerText.replace(/\\n+/g, ' ').trim() : 'No Title';\n    const problemsContainer = cat.children[1];\n    if (!problemsContainer) return { title, problems: [] };\n    const problemEls = Array.from(problemsContainer.children);\n    return {\n      title,\n      problems: problemEls.map(probEl =\u003e {\n        const nameEl = probEl.querySelector('p');\n        const name = nameEl ? nameEl.innerText.trim() : 'Unknown';\n        const allLinks = Array.from(probEl.querySelectorAll('a'));\n        const cleanLink = (link) =\u003e {\n          if (!link) return '';\n          if (link.endsWith('/play') || link.includes('/play')) return '';\n          return link;\n        };\n        return {\n          name,\n          cn: cleanLink(allLinks[0]?.href),\n          gfg: cleanLink(allLinks[1]?.href),\n          lc: cleanLink(allLinks[2]?.href)\n        };\n      })\n    };\n  });\n})()","PageId":"0469302235852E9A8C142263FA6950C2","Title":"Extract problems","explanation":"Execute the problem extraction JavaScript script.","toolAction":"Executing JavaScript","toolSummary":"JavaScript execution"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 12: open_browser_url
+Arguments:
+```json
+{"PageIdToReplace":"0469302235852E9A8C142263FA6950C2","Url":"https://a2zdsa.pages.dev/stack_n_queue","explanation":"Navigate to stack_n_queue page.","toolAction":"Opening browser URL","toolSummary":"Web navigation"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 14: list_browser_pages
+Arguments:
+```json
+{"explanation":"Confirm current open pages.","toolAction":"Listing browser pages","toolSummary":"Page listing"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 16: wait
+Arguments:
+```json
+{"duration_ms":3000,"explanation":"Wait for stack_n_queue to load.","toolAction":"Waiting for page load","toolSummary":"Wait"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 18: execute_browser_javascript
+Arguments:
+```json
+{"JavaScriptDescription":"Extract problems and links from stack_n_queue.","JavaScriptSource":"(() =\u003e {\n  const categories = Array.from(document.querySelectorAll('.singleCategory'));\n  return categories.map(cat =\u003e {\n    const titleEl = cat.querySelector('.css-1wnm7qn');\n    const title = titleEl ? titleEl.innerText.replace(/\\n+/g, ' ').trim() : 'No Title';\n    const problemsContainer = cat.children[1];\n    if (!problemsContainer) return { title, problems: [] };\n    const problemEls = Array.from(problemsContainer.children);\n    return {\n      title,\n      problems: problemEls.map(probEl =\u003e {\n        const nameEl = probEl.querySelector('p');\n        const name = nameEl ? nameEl.innerText.trim() : 'Unknown';\n        const allLinks = Array.from(probEl.querySelectorAll('a'));\n        const cleanLink = (link) =\u003e {\n          if (!link) return '';\n          if (link.endsWith('/play') || link.includes('/play')) return '';\n          return link;\n        };\n        return {\n          name,\n          cn: cleanLink(allLinks[0]?.href),\n          gfg: cleanLink(allLinks[1]?.href),\n          lc: cleanLink(allLinks[2]?.href)\n        };\n      })\n    };\n  });\n})()","PageId":"0469302235852E9A8C142263FA6950C2","Title":"Extract stack_n_queue","explanation":"Execute the problem extraction JavaScript script.","toolAction":"Executing JavaScript","toolSummary":"JavaScript execution"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 20: open_browser_url
+Arguments:
+```json
+{"PageIdToReplace":"0469302235852E9A8C142263FA6950C2","Url":"https://a2zdsa.pages.dev/two_pointers","explanation":"Navigate to two_pointers page.","toolAction":"Opening browser URL","toolSummary":"Web navigation"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 22: wait
+Arguments:
+```json
+{"duration_ms":3000,"explanation":"Wait for two_pointers to load.","toolAction":"Waiting for page load","toolSummary":"Wait"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 24: execute_browser_javascript
+Arguments:
+```json
+{"JavaScriptDescription":"Extract problems and links from two_pointers.","JavaScriptSource":"(() =\u003e {\n  const categories = Array.from(document.querySelectorAll('.singleCategory'));\n  return categories.map(cat =\u003e {\n    const titleEl = cat.querySelector('.css-1wnm7qn');\n    const title = titleEl ? titleEl.innerText.replace(/\\n+/g, ' ').trim() : 'No Title';\n    const problemsContainer = cat.children[1];\n    if (!problemsContainer) return { title, problems: [] };\n    const problemEls = Array.from(problemsContainer.children);\n    return {\n      title,\n      problems: problemEls.map(probEl =\u003e {\n        const nameEl = probEl.querySelector('p');\n        const name = nameEl ? nameEl.innerText.trim() : 'Unknown';\n        const allLinks = Array.from(probEl.querySelectorAll('a'));\n        const cleanLink = (link) =\u003e {\n          if (!link) return '';\n          if (link.endsWith('/play') || link.includes('/play')) return '';\n          return link;\n        };\n        return {\n          name,\n          cn: cleanLink(allLinks[0]?.href),\n          gfg: cleanLink(allLinks[1]?.href),\n          lc: cleanLink(allLinks[2]?.href)\n        };\n      })\n    };\n  });\n})()","PageId":"0469302235852E9A8C142263FA6950C2","Title":"Extract two_pointers","explanation":"Execute the problem extraction JavaScript script.","toolAction":"Executing JavaScript","toolSummary":"JavaScript execution"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 26: open_browser_url
+Arguments:
+```json
+{"PageIdToReplace":"0469302235852E9A8C142263FA6950C2","Url":"https://a2zdsa.pages.dev/heaps","explanation":"Navigate to heaps page.","toolAction":"Opening browser URL","toolSummary":"Web navigation"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 28: wait
+Arguments:
+```json
+{"duration_ms":3000,"explanation":"Wait for heaps to load.","toolAction":"Waiting for page load","toolSummary":"Wait"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 30: execute_browser_javascript
+Arguments:
+```json
+{"JavaScriptDescription":"Extract problems and links from heaps.","JavaScriptSource":"(() =\u003e {\n  const categories = Array.from(document.querySelectorAll('.singleCategory'));\n  return categories.map(cat =\u003e {\n    const titleEl = cat.querySelector('.css-1wnm7qn');\n    const title = titleEl ? titleEl.innerText.replace(/\\n+/g, ' ').trim() : 'No Title';\n    const problemsContainer = cat.children[1];\n    if (!problemsContainer) return { title, problems: [] };\n    const problemEls = Array.from(problemsContainer.children);\n    return {\n      title,\n      problems: problemEls.map(probEl =\u003e {\n        const nameEl = probEl.querySelector('p');\n        const name = nameEl ? nameEl.innerText.trim() : 'Unknown';\n        const allLinks = Array.from(probEl.querySelectorAll('a'));\n        const cleanLink = (link) =\u003e {\n          if (!link) return '';\n          if (link.endsWith('/play') || link.includes('/play')) return '';\n          return link;\n        };\n        return {\n          name,\n          cn: cleanLink(allLinks[0]?.href),\n          gfg: cleanLink(allLinks[1]?.href),\n          lc: cleanLink(allLinks[2]?.href)\n        };\n      })\n    };\n  });\n})()","PageId":"0469302235852E9A8C142263FA6950C2","Title":"Extract heaps","explanation":"Execute the problem extraction JavaScript script.","toolAction":"Executing JavaScript","toolSummary":"JavaScript execution"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 32: open_browser_url
+Arguments:
+```json
+{"PageIdToReplace":"0469302235852E9A8C142263FA6950C2","Url":"https://a2zdsa.pages.dev/greedy","explanation":"Navigate to greedy page.","toolAction":"Opening browser URL","toolSummary":"Web navigation"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 34: wait
+Arguments:
+```json
+{"duration_ms":3000,"explanation":"Wait for greedy to load.","toolAction":"Waiting for page load","toolSummary":"Wait"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 36: execute_browser_javascript
+Arguments:
+```json
+{"JavaScriptDescription":"Extract problems and links from greedy.","JavaScriptSource":"(() =\u003e {\n  const categories = Array.from(document.querySelectorAll('.singleCategory'));\n  return categories.map(cat =\u003e {\n    const titleEl = cat.querySelector('.css-1wnm7qn');\n    const title = titleEl ? titleEl.innerText.replace(/\\n+/g, ' ').trim() : 'No Title';\n    const problemsContainer = cat.children[1];\n    if (!problemsContainer) return { title, problems: [] };\n    const problemEls = Array.from(problemsContainer.children);\n    return {\n      title,\n      problems: problemEls.map(probEl =\u003e {\n        const nameEl = probEl.querySelector('p');\n        const name = nameEl ? nameEl.innerText.trim() : 'Unknown';\n        const allLinks = Array.from(probEl.querySelectorAll('a'));\n        const cleanLink = (link) =\u003e {\n          if (!link) return '';\n          if (link.endsWith('/play') || link.includes('/play')) return '';\n          return link;\n        };\n        return {\n          name,\n          cn: cleanLink(allLinks[0]?.href),\n          gfg: cleanLink(allLinks[1]?.href),\n          lc: cleanLink(allLinks[2]?.href)\n        };\n      })\n    };\n  });\n})()","PageId":"0469302235852E9A8C142263FA6950C2","Title":"Extract greedy","explanation":"Execute the problem extraction JavaScript script.","toolAction":"Executing JavaScript","toolSummary":"JavaScript execution"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 38: open_browser_url
+Arguments:
+```json
+{"PageIdToReplace":"0469302235852E9A8C142263FA6950C2","Url":"https://a2zdsa.pages.dev/binary_tree","explanation":"Navigate to binary_tree page.","toolAction":"Opening browser URL","toolSummary":"Web navigation"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 40: wait
+Arguments:
+```json
+{"duration_ms":3000,"explanation":"Wait for binary_tree to load.","toolAction":"Waiting for page load","toolSummary":"Wait"}
+```
+Status: CORTEX_STEP_STATUS_DONE
+
+### Step 42: execute_browser_javascript
+Arguments:
+```json
+{"JavaScriptDescription":"Extract problems and links from binary_tree.","JavaScriptSource":"(() =\u003e {\n  const categories = Array.from(document.querySelectorAll('.singleCategory'));\n  return categories.map(cat =\u003e {\n    const titleEl = cat.querySelector('.css-1wnm7qn');\n    const title = titleEl ? titleEl.innerText.replace(/\\n+/g, ' ').trim() : 'No Title';\n    const problemsContainer = cat.children[1];\n    if (!problemsContainer) return { title, problems: [] };\n    const problemEls = Array.from(problemsContainer.children);\n    return {\n      title,\n      problems: problemEls.map(probEl =\u003e {\n        const nameEl = probEl.querySelector('p');\n        const name = nameEl ? nameEl.innerText.trim() : 'Unknown';\n        const allLinks = Array.from(probEl.querySelectorAll('a'));\n        const cleanLink = (link) =\u003e {\n          if (!link) return '';\n          if (link.endsWith('/play') || li
+<truncated 46319 bytes>
+
+NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.
