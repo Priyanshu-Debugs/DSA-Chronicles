@@ -10,6 +10,7 @@ import { db, doc, getDoc, setDoc, onSnapshot } from "@/lib/firebase";
 import PracticeArena from "@/components/Dashboard/PracticeArena";
 import { getProblemMeta } from "@/components/Visualizer/visualizerRegistry";
 import VisualizerModal from "@/components/Visualizer/VisualizerModal";
+import QuestionModal from "@/components/Tracker/QuestionModal";
 
 interface DsaDashboardProps {
   stepIdFilter?: string | string[];
@@ -24,6 +25,7 @@ interface DashboardTopic {
 }
 
 const dashboardTopics: DashboardTopic[] = [
+  { name: "SQL Top 50", href: "/sql", stepIds: ["sql-select", "sql-joins", "sql-aggregates", "sql-sorting-grouping", "sql-advanced-select-joins", "sql-subqueries", "sql-string-regex"], color: "bg-neoYellow", icon: "ti ti-database" },
   { name: "Arrays", href: "/arrays", stepIds: ["step-1"], color: "bg-neoPink", icon: "ti ti-list-numbers" },
   { name: "Binary Search", href: "/binary-search", stepIds: ["step-2"], color: "bg-neoBlue", icon: "ti ti-binary" },
   { name: "Strings", href: "/strings", stepIds: ["step-3", "step-7"], color: "bg-neoYellow", icon: "ti ti-abc" },
@@ -50,6 +52,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
   const [syncing, setSyncing] = useState(false);
   const [profileSyncing, setProfileSyncing] = useState(false);
   const [activeTab, setActiveTab] = useState<"sheet" | "practice">("sheet");
+  const [activeModalProblem, setActiveModalProblem] = useState<Problem | null>(null);
 
   interface Toast {
     id: string;
@@ -1013,7 +1016,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
               🗺️ DSA Topics Roadmap
             </h2>
             <span className="bg-neoYellow border-2 border-black font-black text-xs px-2.5 py-1 uppercase shadow-neo-sm text-black">
-              15 Topics Total
+              {dashboardTopics.length} Topics Total
             </span>
           </div>
 
@@ -1028,17 +1031,21 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
                 >
                   <div>
                     {/* Topic Header Card */}
-                    <div className="flex justify-between items-start gap-2">
-                      <div className="flex items-center gap-3">
-                        <div className={`${topic.color} text-black border-2 border-black w-10 h-10 rounded-lg flex items-center justify-center font-black shadow-neo-sm transform -rotate-3 group-hover:rotate-0 transition-transform`}>
+                    <div className="flex justify-between items-start gap-2 min-w-0">
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div className={`${topic.color} text-black border-2 border-black w-10 h-10 rounded-lg flex items-center justify-center font-black shadow-neo-sm transform -rotate-3 group-hover:rotate-0 transition-transform shrink-0`}>
                           <i className={`${topic.icon} text-lg`} />
                         </div>
-                        <h3 className="font-black text-base md:text-lg uppercase group-hover:underline text-black">
+                        <h3 className="font-black text-sm md:text-base uppercase group-hover:underline text-black truncate">
                           {topic.name}
                         </h3>
                       </div>
-                      <span className="text-[10px] font-black uppercase text-gray-400 bg-gray-100 border border-gray-300 px-2 py-0.5 rounded shrink-0">
-                        {topic.stepIds.map(s => s.replace("step-", "S")).join(" & ")}
+                      <span className="text-[10px] font-black uppercase text-gray-500 bg-gray-100 border border-gray-300 px-2 py-0.5 rounded shrink-0">
+                        {topic.stepIds.some((s) => s.startsWith("sql-"))
+                          ? "SQL 50"
+                          : topic.stepIds.length > 2
+                          ? `${topic.stepIds.length} Steps`
+                          : topic.stepIds.map((s) => s.replace("step-", "S")).join(" & ")}
                       </span>
                     </div>
 
@@ -1117,7 +1124,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
                                     <th className="py-2 px-3">Problem Name</th>
                                     <th className="py-2 px-3 w-24 text-center">Visual</th>
                                     <th className="py-2 px-3 w-40 text-center">Practice</th>
-                                    <th className="py-2 px-3 w-20 text-center">Note</th>
+                                    <th className="py-2 px-3 w-32 text-center">Revise & Notes</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -1148,9 +1155,11 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
                                         {/* Name */}
                                         <td className="py-3 px-3">
                                           <span
-                                            className={`font-bold text-sm md:text-base ${
+                                            onClick={() => setActiveModalProblem(problem)}
+                                            className={`font-bold text-sm md:text-base cursor-pointer hover:underline ${
                                               isSolved ? "line-through text-gray-400" : "text-black"
                                             }`}
+                                            title="Click to view full question statement & revision notes"
                                           >
                                             {problem.name}
                                           </span>
@@ -1200,16 +1209,16 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
                                           </div>
                                         </td>
 
-                                        {/* Custom Notes Toggle */}
+                                        {/* Question Statement & Revision Notes Modal Trigger */}
                                         <td className="py-3 px-3 text-center">
                                           <button
-                                            onClick={() => setEditingProblem(problem)}
+                                            onClick={() => setActiveModalProblem(problem)}
                                             className={`py-1 px-3 border-2 border-black rounded font-black text-xs transition-all neo-clickable cursor-pointer uppercase ${
-                                              hasNote ? "bg-neoPurple text-white shadow-none" : "bg-white text-black hover:bg-gray-100 shadow-neo-sm"
+                                              hasNote ? "bg-neoPurple text-white shadow-none" : "bg-neoBlue text-black hover:bg-blue-300 shadow-neo-sm"
                                             }`}
-                                            title="View/Add Notes"
+                                            title="View question details & revision notes"
                                           >
-                                            {hasNote ? "Edit Note" : "Add Note"}
+                                            {hasNote ? "📝 Notes" : "📖 Revise"}
                                           </button>
                                         </td>
                                       </tr>
@@ -1274,6 +1283,26 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
           onClose={() => setVisualizingProblem(null)}
         />
       )}
+
+      {/* Question Statement & Revision Notes Modal Overlay */}
+      <QuestionModal
+        isOpen={!!activeModalProblem}
+        onClose={() => setActiveModalProblem(null)}
+        problem={activeModalProblem}
+        isSolved={!!activeModalProblem && !!solvedMap[activeModalProblem.id]?.solved}
+        onToggleSolved={toggleSolved}
+        initialNote={activeModalProblem ? notesMap[activeModalProblem.id] || "" : ""}
+        onSaveNote={(content) => {
+          if (!activeModalProblem) return;
+          const newNotesMap = { ...notesMap, [activeModalProblem.id]: content };
+          setNotesMap(newNotesMap);
+          if (!user) localStorage.setItem("dsa_notes_map", JSON.stringify(newNotesMap));
+          if (user && db) {
+            setSyncing(true);
+            setDoc(doc(db, "users", user.uid), { notesMap: newNotesMap }, { merge: true }).finally(() => setSyncing(false));
+          }
+        }}
+      />
 
       {/* Toast Notification Overlays */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm w-full">

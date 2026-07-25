@@ -617,6 +617,9 @@ export default function ProfilePage() {
                   <img
                     src={gfgStats.profilePicture}
                     alt="GFG profile"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "https://media.geeksforgeeks.org/gfg-gg-logo.svg";
+                    }}
                     className="w-10 h-10 border-2 border-black rounded-md mb-2 object-cover"
                   />
                 )}

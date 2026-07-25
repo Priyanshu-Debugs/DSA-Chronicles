@@ -13,6 +13,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { name: "All", href: "/dashboard", color: "bg-white" },
+  { name: "SQL Top 50", href: "/sql", color: "bg-neoYellow" },
   { name: "Sandbox", href: "/visualizer-sandbox", color: "bg-neoYellow" },
   { name: "Arrays", href: "/arrays", color: "bg-neoPink" },
   { name: "Binary Search", href: "/binary-search", color: "bg-neoBlue" },
