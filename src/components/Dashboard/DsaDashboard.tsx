@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Problem, a2zDsaSheetData } from "@/data/a2zDsaSheet";
+import { sqlTop50SheetData } from "@/data/sqlTop50Sheet";
 import ProgressGrid from "@/components/Tracker/ProgressGrid";
 import NotebookEditor from "@/components/Notebook/NotebookEditor";
 import { useAuth } from "@/context/AuthContext";
@@ -104,19 +105,19 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
       const normalizeName = (name: string) =>
         name.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-      a2zDsaSheetData.forEach((step) => {
+      [...a2zDsaSheetData, ...sqlTop50SheetData].forEach((step) => {
         step.lessons.forEach((l) => {
           l.topics.forEach((t) => {
             t.problems.forEach((p) => {
-              if (p.leetcodeSlug) {
-                slugToIdMap[p.leetcodeSlug] = p.id;
+              if ((p as any).leetcodeSlug) {
+                slugToIdMap[(p as any).leetcodeSlug] = p.id;
               }
               const lcSlug = getLeetCodeSlug(p.leetcodeUrl);
               if (lcSlug) {
                 slugToIdMap[lcSlug] = p.id;
               }
-              if (p.gfgSlug) {
-                slugToIdMap[p.gfgSlug.toLowerCase()] = p.id;
+              if ((p as any).gfgSlug) {
+                slugToIdMap[(p as any).gfgSlug.toLowerCase()] = p.id;
               }
               const gfgSlug = cleanGfgSlug(p.gfgUrl);
               if (gfgSlug) {
@@ -142,7 +143,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
 
       // Helper map to find problem name by ID
       const idToNameMap: Record<string, string> = {};
-      a2zDsaSheetData.forEach((step) => {
+      [...a2zDsaSheetData, ...sqlTop50SheetData].forEach((step) => {
         step.lessons.forEach((l) => {
           l.topics.forEach((t) => {
             t.problems.forEach((p) => {
