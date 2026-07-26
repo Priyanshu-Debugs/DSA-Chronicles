@@ -17,6 +17,15 @@ const QUICK_PROMPTS = [
   "🚀 Explain Kadane's Algorithm",
 ];
 
+const SQL_QUICK_PROMPTS = [
+  "⚡ Explain INNER vs LEFT JOIN with examples",
+  "🚀 How do Window Functions (ROW_NUMBER, RANK) work?",
+  "🧠 What is a CTE (Common Table Expression)?",
+  "📊 How to optimize slow queries with Indexes?",
+  "💡 Difference between WHERE and HAVING?",
+  "🛠️ Explain DDL vs DML commands",
+];
+
 // High-fidelity SVG Gemini Star Logo
 function GeminiLogo({ className = "w-6 h-6" }: { className?: string }) {
   return (
@@ -36,7 +45,7 @@ function GeminiLogo({ className = "w-6 h-6" }: { className?: string }) {
         height="65"
       >
         <path
-          d="M32.447 0c.68 0 1.273.465 1.439 1.125a38.904 38.904 0 001.999 5.905c2.152 5 5.105 9.376 8.854 13.125 3.751 3.75 8.126 6.703 13.125 8.855a38.98 38.98 0 005.906 1.999c.66.166 1.124.758 1.124 1.438 0 .68-.464 1.273-1.125 1.439a38.902 38.902 0 00-5.905 1.999c-5 2.152-9.375 5.105-13.125 8.854-3.749 3.751-6.702 8.126-8.854 13.125a38.973 38.973 0 00-2 5.906 1.485 1.485 0 01-1.438 1.124c-.68 0-1.272-.464-1.438-1.125a38.913 38.913 0 00-2-5.905c-2.151-5-5.103-9.375-8.854-13.125-3.7-3.749-8.125-6.702-13.125-8.854a38.973 38.973 0 00-5.905-2A1.485 1.485 0 010 32.448c0-.68.465-1.272 1.125-1.438a38.903 38.903 0 005.905-2c5-2.151 9.376-5.104 13.125-8.854 3.75-3.749 6.703-8.125 8.855-13.125a38.972 38.972 0 001.999-5.905A1.485 1.485 0 0132.447 0z"
+          d="M32.447 0c.68 0 1.273.465 1.439 1.125a38.904 38.904 0 001.999 5.905c2.152 5 5.105 9.376 8.854 13.125 3.751 3.75 8.126 6.703 13.125 8.855a38.98 38.98 0 005.906 1.999c.66.166 1.124.758 1.124 1.438 0 .68-.464 1.273-1.125 1.439a38.902 38.902 0 00-5.905 1.999c-5 2.152-9.375 5.105-13.125 8.854-3.749 3.751-6.702 8.126-8.854 13.125a38.973 38.973 0 00-2 5.906 1.485 1.485 0 01-1.438 1.124c-.68 0-1.272-.464-1.438-1.125a38.913 38.913 0 00-2-5.905c-2.151-5-5.103-9.375-8.854-13.125-3.75-3.749-8.125-6.702-13.125-8.854a38.973 38.973 0 00-5.905-2A1.485 1.485 0 010 32.448c0-.68.465-1.272 1.125-1.438a38.903 38.903 0 005.905-2c5-2.151 9.376-5.104 13.125-8.854 3.75-3.749 6.703-8.125 8.855-13.125a38.972 38.972 0 001.999-5.905A1.485 1.485 0 0132.447 0z"
           fill="#000"
         />
         <path
@@ -274,19 +283,19 @@ function GeminiLogo({ className = "w-6 h-6" }: { className?: string }) {
   );
 }
 
-
-
 export default function Chatbot() {
   const { user, isGuest } = useAuth();
   const pathname = usePathname();
+  const isSqlPage = pathname && (pathname.startsWith("/notes/sql") || pathname.startsWith("/sql"));
 
   const [isOpen, setIsOpen] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content:
-        "Hey there! I am your DSA Helper. Ask me anything about Data Structures, Algorithms, or your current sheet problems!",
+      content: isSqlPage
+        ? "Hey SQL Explorer! ⚡ I am your SQL & Database Assistant. Ask me anything about SQL queries, Joins, Window Functions, Optimization, or your current PDF study notes!"
+        : "Hey there! I am your DSA Helper. Ask me anything about Data Structures, Algorithms, or your current sheet problems!",
     },
   ]);
   const [inputValue, setInputValue] = useState("");
@@ -294,6 +303,20 @@ export default function Chatbot() {
   const [error, setError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Update initial message when switching between SQL and DSA routes
+  useEffect(() => {
+    if (messages.length === 1 && messages[0].role === "assistant") {
+      setMessages([
+        {
+          role: "assistant",
+          content: isSqlPage
+            ? "Hey SQL Explorer! ⚡ I am your SQL & Database Assistant. Ask me anything about SQL queries, Joins, Window Functions, Optimization, or your current PDF study notes!"
+            : "Hey there! I am your DSA Helper. Ask me anything about Data Structures, Algorithms, or your current sheet problems!",
+        },
+      ]);
+    }
+  }, [isSqlPage]);
 
   // Auto-scroll to bottom of messages
   useEffect(() => {
@@ -312,13 +335,24 @@ export default function Chatbot() {
     setIsLoading(true);
     setError(null);
 
+    // Extract active PDF parameter if currently on /notes/sql
+    let activePdf: string | null = null;
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      activePdf = searchParams.get("pdf") || searchParams.get("file");
+    }
+
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ messages: updatedMessages }),
+        body: JSON.stringify({
+          messages: updatedMessages,
+          pathname,
+          activePdf,
+        }),
       });
 
       if (!response.ok) {
@@ -486,8 +520,8 @@ export default function Chatbot() {
       {!isOpen && (
         <div className="fixed bottom-[88px] right-6 bg-neoPink border-2 border-black px-3 py-1.5 text-[10px] font-black uppercase shadow-neo-sm z-50 rounded-none max-w-[200px] text-center select-none text-black animate-bounce">
           {requiresLogin
-            ? "AI DSA Helper — Login to get started!"
-            : "AI DSA Helper — Ask anything about this problem!"}
+            ? isSqlPage ? "SQL AI Helper — Login to get started!" : "AI DSA Helper — Login to get started!"
+            : isSqlPage ? "SQL AI Helper — Ask any SQL & PDF question!" : "AI DSA Helper — Ask anything about this problem!"}
           {/* Small arrow pointing down */}
           <div className="absolute top-full right-5 w-3 h-3 bg-neoPink border-r-2 border-b-2 border-black transform rotate-45 -translate-y-1.5" />
         </div>
@@ -519,7 +553,7 @@ export default function Chatbot() {
           <div className="bg-neoPink border-b-4 border-black p-3.5 flex items-center justify-between font-black uppercase text-sm select-none">
             <div className="flex items-center gap-2 text-black font-black">
               <GeminiLogo className="w-5 h-5" />
-              <span>DSA HELPER</span>
+              <span>{isSqlPage ? "SQL HELPER" : "DSA HELPER"}</span>
             </div>
             {/* Mock Windows Controls */}
             <div className="flex gap-1.5">
@@ -559,7 +593,7 @@ export default function Chatbot() {
                 <GeminiLogo className="w-16 h-16 mx-auto mb-4" />
                 <h3 className="font-black text-xl uppercase mb-2 text-black">Login Required</h3>
                 <p className="font-bold text-sm text-gray-700 mb-5 leading-relaxed">
-                  Sign in to unlock the AI-powered DSA Helper. Get instant explanations, code solutions, and step-by-step guidance!
+                  Sign in to unlock the AI-powered {isSqlPage ? "SQL Helper" : "DSA Helper"}. Get instant explanations, queries, and step-by-step guidance!
                 </p>
                 <a
                   href="/login"
@@ -571,7 +605,10 @@ export default function Chatbot() {
               <div className="flex flex-col items-center gap-2">
                 <span className="text-[10px] font-black uppercase text-gray-400">Features include</span>
                 <div className="flex flex-wrap gap-1.5 justify-center max-w-xs">
-                  {["DSA Explanations", "Code Solutions", "Complexity Analysis", "Problem Hints"].map((feat) => (
+                  {(isSqlPage
+                    ? ["SQL Queries", "Join Explanations", "Window Functions", "PDF Guidance"]
+                    : ["DSA Explanations", "Code Solutions", "Complexity Analysis", "Problem Hints"]
+                  ).map((feat) => (
                     <span
                       key={feat}
                       className="bg-white border-2 border-black px-2 py-1 text-[9px] font-black uppercase text-gray-600 shadow-neo-sm"
@@ -607,7 +644,7 @@ export default function Chatbot() {
                       )}
                     </div>
                     <span className="text-[9px] font-black uppercase text-gray-500 mt-1 px-1">
-                      {msg.role === "user" ? "You" : "DSA Helper"}
+                      {msg.role === "user" ? "You" : isSqlPage ? "SQL Helper" : "DSA Helper"}
                     </span>
                   </div>
                 ))}
@@ -617,13 +654,13 @@ export default function Chatbot() {
                   <div className="self-start flex flex-col max-w-[85%] items-start">
                     <div className="bg-white border-2 border-black p-3 text-xs shadow-neo-sm text-black rounded-none flex items-center gap-1 font-bold">
                       <GeminiLogo className="w-4 h-4 animate-spin" />
-                      <span>Helper is typing</span>
+                      <span>{isSqlPage ? "SQL Helper is typing" : "Helper is typing"}</span>
                       <span className="animate-bounce">.</span>
                       <span className="animate-bounce [animation-delay:0.2s]">.</span>
                       <span className="animate-bounce [animation-delay:0.4s]">.</span>
                     </div>
                     <span className="text-[9px] font-black uppercase text-gray-500 mt-1 px-1">
-                      DSA Helper
+                      {isSqlPage ? "SQL Helper" : "DSA Helper"}
                     </span>
                   </div>
                 )}
@@ -641,7 +678,7 @@ export default function Chatbot() {
               {/* Quick suggestions block (Shown when no pending query is processing) */}
               {!isLoading && (
                 <div className="px-3 py-2 bg-neutral-100 border-t-2 border-black overflow-x-auto flex gap-2 scrollbar-none">
-                  {QUICK_PROMPTS.map((prompt, idx) => (
+                  {(isSqlPage ? SQL_QUICK_PROMPTS : QUICK_PROMPTS).map((prompt, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleSuggestionClick(prompt)}
@@ -662,7 +699,7 @@ export default function Chatbot() {
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask a DSA question..."
+                  placeholder={isSqlPage ? "Ask any SQL question or PDF topic..." : "Ask a DSA question..."}
                   disabled={isLoading}
                   className="flex-1 border-2 border-black p-2 font-bold text-xs bg-neoCream focus:outline-none focus:bg-white placeholder-gray-500 rounded-none"
                 />
