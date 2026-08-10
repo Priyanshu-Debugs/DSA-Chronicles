@@ -7,6 +7,8 @@ export interface Problem {
   leetcodeSlug?: string;
   /** Explicit GFG problem slug for matching when gfgUrl uses a different domain/format */
   gfgSlug?: string;
+  difficulty?: "Easy" | "Medium" | "Hard" | string;
+  category?: string;
 }
 
 export interface Topic {

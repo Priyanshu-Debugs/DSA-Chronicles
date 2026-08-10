@@ -2,6 +2,8 @@ import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs, doc, setDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 import { a2zDsaSheetData } from "@/data/a2zDsaSheet";
+import { sqlTop50SheetData } from "@/data/sqlTop50Sheet";
+import { leetcode75SheetData } from "@/data/leetcode75Sheet";
 
 export async function POST(req: Request) {
   try {
@@ -47,7 +49,7 @@ export async function POST(req: Request) {
     // 3. Match the target slug against problems in the dataset
     let matchedProblemId = "";
     
-    for (const step of a2zDsaSheetData) {
+    for (const step of [...leetcode75SheetData, ...sqlTop50SheetData, ...a2zDsaSheetData]) {
       for (const lesson of step.lessons) {
         for (const topic of lesson.topics) {
           for (const problem of topic.problems) {

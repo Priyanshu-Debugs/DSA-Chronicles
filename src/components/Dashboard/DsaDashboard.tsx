@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Problem, a2zDsaSheetData } from "@/data/a2zDsaSheet";
 import { sqlTop50SheetData } from "@/data/sqlTop50Sheet";
+import { leetcode75SheetData } from "@/data/leetcode75Sheet";
 import ProgressGrid from "@/components/Tracker/ProgressGrid";
 import NotebookEditor from "@/components/Notebook/NotebookEditor";
 import { useAuth } from "@/context/AuthContext";
@@ -26,6 +27,7 @@ interface DashboardTopic {
 }
 
 const dashboardTopics: DashboardTopic[] = [
+  { name: "LeetCode 75", href: "/leetcode-75", stepIds: ["lc75-array-string", "lc75-two-pointers", "lc75-sliding-window", "lc75-prefix-sum", "lc75-hash-map-set", "lc75-stack", "lc75-queue", "lc75-linked-list", "lc75-binary-tree-dfs", "lc75-binary-tree-bfs", "lc75-binary-search-tree", "lc75-graphs-dfs", "lc75-graphs-bfs", "lc75-heap-priority-queue", "lc75-binary-search", "lc75-backtracking", "lc75-dp-1d", "lc75-dp-multidimensional", "lc75-bit-manipulation", "lc75-trie", "lc75-monotonic-stack", "lc75-intervals"], color: "bg-amber-400", icon: "ti ti-flame" },
   { name: "SQL Top 50", href: "/sql", stepIds: ["sql-select", "sql-joins", "sql-aggregates", "sql-sorting-grouping", "sql-advanced-select-joins", "sql-subqueries", "sql-string-regex"], color: "bg-neoYellow", icon: "ti ti-database" },
   { name: "Arrays", href: "/arrays", stepIds: ["step-1"], color: "bg-neoPink", icon: "ti ti-list-numbers" },
   { name: "Binary Search", href: "/binary-search", stepIds: ["step-2"], color: "bg-neoBlue", icon: "ti ti-binary" },
@@ -105,7 +107,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
       const normalizeName = (name: string) =>
         name.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-      [...a2zDsaSheetData, ...sqlTop50SheetData].forEach((step) => {
+      [...leetcode75SheetData, ...a2zDsaSheetData, ...sqlTop50SheetData].forEach((step) => {
         step.lessons.forEach((l) => {
           l.topics.forEach((t) => {
             t.problems.forEach((p) => {
@@ -143,7 +145,7 @@ export default function DsaDashboard({ stepIdFilter }: DsaDashboardProps) {
 
       // Helper map to find problem name by ID
       const idToNameMap: Record<string, string> = {};
-      [...a2zDsaSheetData, ...sqlTop50SheetData].forEach((step) => {
+      [...leetcode75SheetData, ...a2zDsaSheetData, ...sqlTop50SheetData].forEach((step) => {
         step.lessons.forEach((l) => {
           l.topics.forEach((t) => {
             t.problems.forEach((p) => {

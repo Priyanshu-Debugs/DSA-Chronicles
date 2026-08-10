@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { db, doc, getDoc, setDoc } from "@/lib/firebase";
 import { a2zDsaSheetData } from "@/data/a2zDsaSheet";
+import { sqlTop50SheetData } from "@/data/sqlTop50Sheet";
+import { leetcode75SheetData } from "@/data/leetcode75Sheet";
 
 export default function ProfilePage() {
   const { user, profile, loading, updateProfile, isGuest } = useAuth();
@@ -154,7 +156,7 @@ export default function ProfilePage() {
 
     try {
       const slugToIdMap: Record<string, string> = {};
-      a2zDsaSheetData.forEach((step) => {
+      [...leetcode75SheetData, ...sqlTop50SheetData, ...a2zDsaSheetData].forEach((step) => {
         step.lessons.forEach((l) => {
           l.topics.forEach((t) => {
             t.problems.forEach((p) => {
@@ -202,7 +204,7 @@ export default function ProfilePage() {
 
       // Build name-based fallback index
       const nameToIdMap: Record<string, string> = {};
-      a2zDsaSheetData.forEach((step) => {
+      [...leetcode75SheetData, ...sqlTop50SheetData, ...a2zDsaSheetData].forEach((step) => {
         step.lessons.forEach((l) => {
           l.topics.forEach((t) => {
             t.problems.forEach((p) => {
@@ -282,7 +284,7 @@ export default function ProfilePage() {
       const normalizeName = (name: string) =>
         name.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-      a2zDsaSheetData.forEach((step) => {
+      [...leetcode75SheetData, ...sqlTop50SheetData, ...a2zDsaSheetData].forEach((step) => {
         step.lessons.forEach((l) => {
           l.topics.forEach((t) => {
             t.problems.forEach((p) => {
